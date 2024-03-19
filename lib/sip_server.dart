@@ -1,11 +1,12 @@
+import 'package:dart_sip_parser/sip.dart';
+
 import "requests_handler.dart";
-import 'SipMessage.dart';
-import "SipMessageFactory.dart";
-import 'addr_port.dart';
+//import 'SipMessage.dart';
+//import "SipMessageFactory.dart";
 import 'dart:io';
 import 'globals.dart';
 
-import 'addr_port.dart';
+//import 'addr_port.dart';
 
 class SipServer {
   // SipServer(String ip, {int port = 5060}){
@@ -15,7 +16,7 @@ class SipServer {
   SipServer(String ip, int port) {
     //RawDatagramSocket _socket;
     ReqHandler? handler;
-    SipMessageFactory messagesFactory = SipMessageFactory();
+    //SipMessageFactory messagesFactory = SipMessageFactory();
 
     RawDatagramSocket.bind(InternetAddress(ip), port)
         .then((RawDatagramSocket socket) {
@@ -49,12 +50,15 @@ class SipServer {
 
         onNewMessage(String data, sockaddr_in src) {
           // print(data);
-          dynamic msg = messagesFactory.createMessage(data, src) as dynamic;
-          if (msg.isValidMessage()) {
-            handler!.handle(msg);
-          } else {
-            // print("Invalid message");
-          }
+          //dynamic msg = SipMessage(data, src) as dynamic;
+          SipMessage msg = SipMessage(); //data, src) as dynamic;
+          msg.transport = src;
+          msg.Parse(data);
+          //if (msg.isValidMessage()) {
+          handler!.handle(msg, src);
+          //} else {
+          // print("Invalid message");
+          //}
         }
 
         Datagram? d = socket.receive();
@@ -64,7 +68,7 @@ class SipServer {
           //    'Datagram from ${d.address.address}:${d.port}: ${message.trim()}');
 
           // print("\r\n");
-          sockaddr_in src = sockaddr_in(d.address.address, d.port);
+          sockaddr_in src = sockaddr_in(d.address.address, d.port, 'udp');
           // print(
           //     "New message from ${d.address.address}:${d.port} message: $message");
 

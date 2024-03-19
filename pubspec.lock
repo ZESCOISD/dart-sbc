@@ -78,10 +78,18 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "9d8302484dcbf4b2eb82b82704f1e36ba3517e3f"
+      resolved-ref: c982dfab148b5a42d72e741e52f2ab41fef31de4
       url: "https://github.com/Kellykinyama12/dart-sip-parser.git"
     source: git
     version: "1.0.0"
+  dotenv:
+    dependency: "direct main"
+    description:
+      name: dotenv
+      sha256: "379e64b6fc82d3df29461d349a1796ecd2c436c480d4653f3af6872eccbc90e1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.0"
   file:
     dependency: transitive
     description:

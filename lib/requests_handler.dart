@@ -2,6 +2,9 @@ import "dart:core";
 import 'dart:ffi';
 import 'dart:math';
 
+import 'package:dart_sip_parser/sip_message_headers.dart';
+import 'package:dart_sip_parser/sip_message_types.dart';
+
 import 'globals.dart';
 //import "SipMessage.dart";
 import "sip_client.dart";
@@ -9,7 +12,6 @@ import "Session.dart";
 import 'dart:io';
 
 import 'dart:convert';
-import 'addr_port.dart';
 //import 'SipMessageTypes.dart';
 //import 'SipSdpMessage.dart';
 import 'package:dart_sip_parser/sip.dart';
@@ -28,7 +30,7 @@ String IDGen() {
 class ReqHandler {
   int _serverPort;
   Map<String, SipClient> _clients = {};
-  Map<String, Function(dynamic data)> handlers = {};
+  Map<String, Function(SipMessage)> handlers = {};
   void Function(sockaddr_in, dynamic)? _onHandled;
   String _serverIp;
   ReqHandler(String serverIp, int serverPort, RawDatagramSocket socket)
@@ -68,44 +70,62 @@ class ReqHandler {
     // });
   }
 
-  void handle(dynamic request) {
+  void handle(SipMessage request, sockaddr_in protocol) {
     // print(request.getType());
-    if (handlers[request.getType().toLowerCase()] != null) {
+    print(request.Req.Method);
+
+    // ignore: curly_braces_in_flow_control_structures
+    if (request.Req.Method !=
+        // ignore: curly_braces_in_flow_control_structures
+        null) if (handlers[request.Req.Method!.toLowerCase()] != null) {
+      handlers[request.Req.Method!.toLowerCase()]!(request);
       // print(request.getType());
-      try {
-        handlers[request.getType().toLowerCase()]!(request);
-      } catch (error) {
-        // print(error);
-      }
+      // try {
+      //   handlers[request.getType().toLowerCase()]!(request);
+      // } catch (error) {
+      //   // print(error);
+      // }
     }
   }
 
-  bool OnRegister(dynamic data) {
-    bool isUnregisterReq = data.getContact().indexOf("expires=0") != -1;
+  bool OnRegister(SipMessage data) {
+    print(data.Exp.Src);
+    bool isUnregisterReq = data.Exp.Src!.contains("expires=0");
 
     if (!isUnregisterReq) {
       //print("Number ${data.getFromNumber()}");
-      SipClient newClient = SipClient(data.getFromNumber(), data.getSource());
+      SipClient newClient = SipClient(data.From.User!, data.transport!);
       registerClient(newClient);
     }
 
-    SipMessage response = SipMessage(data.toString(), data.getSource());
-    response.setHeader(SipMessageTypes.OK);
-    response.setVia(data.getVia() + ";received=" + _serverIp);
-    response.setTo(data.getTo() + ";tag=" + IDGen());
-    response.setContact("Contact: <sip:" +
-        data.getFromNumber() +
-        "@" +
-        _serverIp +
-        ":" +
-        _serverPort.toString() +
-        ";transport=UDP>");
+    //SipMessage response = SipMessage(data.src!, data.getSource());
+    SipMessage response = SipMessage();
+    response.Parse(data.src!);
+    // response.setHeader(SipMessageTypes.OK);
+    // response.setVia(data.getVia() + ";received=" + _serverIp);
+    // response.setTo(data.getTo() + ";tag=" + IDGen());
+    // response.setContact("Contact: <sip:" +
+    //     data.getFromNumber() +
+    //     "@" +
+    //     _serverIp +
+    //     ":" +
+    //     _serverPort.toString() +
+    //     ";transport=UDP>");
 
+    response.Parse(data.src!);
+    //response.setHeader(SipMessageTypes.OK);
+    response.Req.Src = SipMessageTypes.OK;
+    response.Via[0].Src = "${response.Via[0].Src!};received=$_serverIp";
+    //response.setVia(data.getVia() + ";received=" + _serverIp);
+
+    response.To.Src = "${response.To.Src!};tag=${IDGen()}";
+    response.Contact.Src =
+        "Contact: <sip:${data.From.User!}@$_serverIp:$_serverPort;transport=UDP>";
     // print(response.toString());
-    endHandle(response.getFromNumber(), response);
+    //endHandle(response.getFromNumber(), response);
 
     if (isUnregisterReq) {
-      SipClient newClient = SipClient(data.getFromNumber(), data.getSource());
+      SipClient newClient = SipClient(data.From.User!, data.transport!);
       unregisterClient(newClient);
     }
 
@@ -125,18 +145,18 @@ class ReqHandler {
       print("${destClient.getAddress().addr}:${destClient.getAddress().port}");
 
       //_onHandled!(destClient.getAddress(), message);
-      print(message.getType());
+      //print(message.getType());
       socket.send(
           message.toString().codeUnits,
           InternetAddress(destClient.getAddress().addr),
           destClient.getAddress().port);
     } else {
-      message.setHeader(SipMessageTypes.NOT_FOUND);
-      sockaddr_in src = message.getSource();
+      message.Req.Src = SipMessageTypes.NOT_FOUND;
+      //sockaddr_in src = message.getSource();
       try {
         //_onHandled!(src, message);
-        socket.send(
-            message.toString().codeUnits, InternetAddress(src.addr), src.port);
+        // socket.send(
+        //     message.toString().codeUnits, InternetAddress(src.addr), src.port);
       } catch (error) {
         print(error);
       }
@@ -205,11 +225,14 @@ class ReqHandler {
     // Check if the called is registered
     //SipClient called = findClient(data.getToNumber());
     SipClient? called = _clients[data.getToNumber()];
-    String strMsg = data.toString();
-    SipMessage trying = SipMessage(strMsg, data.getSource());
+    String strMsg = data.src!;
+    // SipMessage trying = SipMessage(strMsg, data.getSource());
+    SipMessage trying = SipMessage();
+    trying.Parse(strMsg);
 
-    trying.setHeader(SipMessageTypes.TRYING);
-    endHandle(trying.getFromNumber(), trying);
+    trying.Req.Src = SipMessageTypes.TRYING;
+    //trying.setHeader(SipMessageTypes.TRYING);
+    //endHandle(trying.getFromNumber(), trying);
 
     // print("Callee is: ");
     // print("Callee is: ${called.getNumber()}");
@@ -217,7 +240,7 @@ class ReqHandler {
     // print(called.getNumber());
     if (called == null) {
       print("Callee is: ${data.getToNumber()} is not registered");
-      //print(data.toString());
+      //print(data.src!);
 
       int sdpDelimitor = strMsg.indexOf(SipMessageHeaders.HEADERS_DELIMETER +
           SipMessageHeaders.HEADERS_DELIMETER);
@@ -256,26 +279,32 @@ class ReqHandler {
       print(data.getType());
       endHandle(data.getFromNumber(), data);
 
-      // socket.send(data.toString().codeUnits,
+      // socket.send(data.src!.codeUnits,
       //     InternetAddress(caller.getAddress().addr), caller.getAddress().port);
       return true;
     }
 
-    SipSdpMessage message = SipSdpMessage(data.toString(), data.getSource());
-    if (!message.isValidMessage()) {
-      print(
-          "Couldn't get SDP from ${data.getFromNumber()}'s INVITE request."); //<< std::endl;
-      return true;
-    }
+    //SipSdpMessage message = SipSdpMessage(data.src!, data.getSource());
+    SipMessage message = SipMessage();
+    //if (!message.isValidMessage()) {
+    // print(
+    //    "Couldn't get SDP from ${data.getFromNumber()}'s INVITE request."); //<< std::endl;
+    //return true;
+    //}
     print("Creating session");
-    Session newSession =
-        Session(data.getCallID(), caller, message.getRtpPort());
-    _sessions?[data.getCallID()] = newSession;
+    // Session newSession =
+    //     Session(data.getCallID(), caller, message.getRtpPort());
+    // _sessions?[data.getCallID()] = newSession;
     print("Session created");
-    SipMessage response = SipMessage(data.toString(), caller.getAddress());
+    //SipMessage response = SipMessage(data.src!, caller.getAddress());
+    SipMessage response = SipMessage();
+    response.Parse(data.src!);
     print("Setting call dialog");
-    response.setContact(
-        "Contact: <sip:${caller.getNumber()}@$_serverIp:$_serverPort;transport=UDP>");
+    // response.setContact(
+    //     "Contact: <sip:${caller.getNumber()}@$_serverIp:$_serverPort;transport=UDP>");
+
+    response.Contact.Src =
+        "Contact: <sip:${caller.getNumber()}@$_serverIp:$_serverPort;transport=UDP>";
 
     print("Setting call dialog after response");
     endHandle(data.getToNumber(), response);
@@ -342,27 +371,41 @@ class ReqHandler {
           return true;
         }
 
-        SipSdpMessage sdpMessage =
-            SipSdpMessage(data.toString(), data.getSource());
-        if (!sdpMessage.isValidMessage()) {
-          print("Coudn't get SDP from: ${client.getNumber()} 's OK message.");
-          endCall(data.getCallID(), data.getFromNumber(), data.getToNumber(),
-              "SDP parse error.");
+        // SipMessage sdpMessage =
+        //     SipSdpMessage(data.src!, data.getSource());
 
-          print("exiting ok");
-          return true;
-        }
+        SipMessage sdpMessage = SipMessage();
+        sdpMessage.Parse(data.src!);
+
+        // if (!sdpMessage.isValidMessage()) {
+        //   print("Coudn't get SDP from: ${client.getNumber()} 's OK message.");
+        //   endCall(data.getCallID(), data.getFromNumber(), data.getToNumber(),
+        //       "SDP parse error.");
+
+        //   print("exiting ok");
+        //   return true;
+        // }
         print("Performing last operation");
-        session.setDest(client, sdpMessage.getRtpPort());
+        //session.setDest(client, sdpMessage.getRtpPort());
         session.setState(State.Connected);
-        SipMessage response = SipMessage(data.toString(), client.getAddress());
-        response.setContact("Contact: <sip:" +
+        SipMessage response = SipMessage();
+        response.Parse(
+            data.toString()); //= SipMessage(data.src!, client.getAddress());
+        // response.setContact("Contact: <sip:" +
+        //     data.getToNumber() +
+        //     "@" +
+        //     _serverIp +
+        //     ":" +
+        //     _serverPort.toString() +
+        //     ";transport=UDP>");
+
+        response.ContType.Src = "Contact: <sip:" +
             data.getToNumber() +
             "@" +
             _serverIp +
             ":" +
             _serverPort.toString() +
-            ";transport=UDP>");
+            ";transport=UDP>";
 
         print("exiting ok");
         endHandle(data.getFromNumber(), response);
