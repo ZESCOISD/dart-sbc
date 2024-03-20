@@ -86,7 +86,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "8993127d5327a4116dc9e5f2fa05dc567f701726"
+      resolved-ref: "09421a95bf3fab21a20881bb18369e355979a3ab"
       url: "https://github.com/Kellykinyama12/dart-sip-parser.git"
     source: git
     version: "1.0.0"

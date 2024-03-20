@@ -17,11 +17,12 @@ void main() {
     'Supported: replaces, norefersub, extended-refer, timer, sec-agree, outbound, path, X-cisco-serviceuri',
     'User-Agent: Z 5.6.1 v2.10.19.9',
     'Allow-Events: presence, kpml, talk, as-feature-event',
-    'Content-Length: 0'
-  ].join(r"\r\n");
+    'Content-Length: 0',
+  ].join("\r\n");
 
   SipMessage sipMsg = SipMessage();
   sipMsg.Parse(register);
+  print("Expires header value: ${sipMsg.Exp.Value}");
 
-  print(register);
+  //print(register);
 }

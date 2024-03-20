@@ -63,6 +63,7 @@ class ReqHandler {
     handlers[SipMessageTypes.BYE.toLowerCase()] = OnBye;
     handlers[SipMessageTypes.OK.toLowerCase()] = OnOk;
     handlers[SipMessageTypes.ACK.toLowerCase()] = OnAck;
+    handlers[SipMessageTypes.UNAUTHORIZED.toLowerCase()] = OnAck;
 
     _sessions = {};
 
@@ -74,56 +75,104 @@ class ReqHandler {
 
   void handle(SipMessage request, sockaddr_in protocol) {
     // print(request.getType());
-    // print(request.Req.Method);
+    //print(request.src);
+    //print("Expires header value: ${request.Exp.Value}");
 
     // ignore: curly_braces_in_flow_control_structures
     if (request.Req.Method != null) {
-      if (handlers[request.Req.Method!.toLowerCase()] != null) {
+      if (handlers[request.Req.Method!.toLowerCase()] != null ||
+          request.Req.Src!.toLowerCase() != null) {
         //print(request.src);
         //var lines = request.src!.split(SipMessageHeaders.HEADERS_DELIMETER);
-        //var lines = request.src!.split(SipMessageHeaders.HEADERS_DELIMETER);
+        var lines = request.src!.split(SipMessageHeaders.HEADERS_DELIMETER);
         // print("Lines length: ${lines[8]}");
-        //handlers[request.Req.Method!.toLowerCase()]!(request);
-        proxy(request);
+        //if (request.Req.Method!.toLowerCase() == "invite") print(request.src);
+
+        if (request.Req.Method!.toLowerCase() == "register") {
+          handlers[request.Req.Method!.toLowerCase()]!(request);
+        } else {
+          proxy(request);
+        }
       }
     }
   }
 
   void proxy(SipMessage msg) {
     //socket.send(buffer, address, port)
-    print(msg.Req.Method);
+    //print(msg.Req.Method);
     //print(msg.src);
     //print("Branch: ${msg.Via[0].Branch}");
 
     //print("Message from: ${msg.transport!.addr}");
 
     if (msg.transport!.addr != "10.43.0.55") {
-      //print("Message to: ${msg.transport!.addr}");
-      transactions[msg.Via[0].Branch!] = msg.transport!;
-      socket.send(msg.src!.codeUnits, InternetAddress("10.43.0.55"), 5080);
+      print("Message to: ${msg.transport!.addr}");
+      var lines = msg.src!.split("\r\n");
+      String via;
+      List<String> finalLines = [];
+      bool viaAdded = false;
+      for (int x = 0; x < lines.length; x++) {
+        if (lines[x].toLowerCase().contains("via") && !viaAdded) {
+          // print("Found via: ${lines[x]}");
+          via = lines[x].replaceFirst("${msg.Via[0].Host}:${msg.Via[0].Port}",
+              "$_serverIp:$_serverPort");
+          //print("Create via: $via");
+          viaAdded = true;
+          finalLines.add(via);
+          finalLines.add(lines[x]);
+        } else {
+          finalLines.add(lines[x]);
+        }
+      }
+      print(finalLines.join("\r\n"));
+      if (msg.Via[0].Branch != null) {
+        transactions[msg.Via[0].Branch!] = msg.transport!;
+      }
+      socket.send(finalLines.join("\r\n").codeUnits,
+          InternetAddress("10.43.0.55"), 5080);
     } else {
-      print("Branch: ${transactions[msg.Via[0].Branch!]!.addr}");
-      //   socket.send(msg.src!.codeUnits, InternetAddress(msg.transport!.addr),
-      //       msg.transport!.port);
-      //   print("Message to: ${msg.transport!.addr}");
+      print("Message from: ${msg.src}");
+
+      var lines = msg.src!.split("\r\n");
+      List<String> finalLines = [];
+      bool viaAdded = false;
+      for (int x = 0; x < lines.length; x++) {
+        if (lines[x].toLowerCase().contains("via") &&
+            !viaAdded &&
+            msg.Via[0].Host == _serverIp) {
+          viaAdded = true;
+        } else {
+          finalLines.add(lines[x]);
+        }
+      }
+      print(finalLines.join("\r\n"));
+      //print("Branch: ${transactions[msg.Via[0].Branch!]!.addr}");
+      socket.send(
+          finalLines.join("\r\n").codeUnits,
+          InternetAddress(transactions[msg.Via[0].Branch!]!.addr),
+          transactions[msg.Via[0].Branch!]!.port);
+      print("Message to: ${msg.transport!.addr}");
     }
     //endHandle(destNumber, message)
   }
 
   bool OnRegister(SipMessage data) {
-    //print(data.src);
-    print(data.Exp.Value);
-    bool isUnregisterReq = data.Exp.Value!.contains("expires=0");
+    print(data.src);
+    print("Expires header value: ${data.Exp.Value}");
+    bool isUnregisterReq = data.Exp.Value == null
+        ? false
+        : data.Exp.Value!.toLowerCase().contains("expires=0");
 
     if (!isUnregisterReq) {
       //print("Number ${data.getFromNumber()}");
       SipClient newClient = SipClient(data.From.User!, data.transport!);
       registerClient(newClient);
     }
+    if (data.Via[0].Branch != null) {
+      transactions[data.Via[0].Branch!] = data.transport!;
+    }
 
-    //SipMessage response = SipMessage(data.src!, data.getSource());
-    SipMessage response = SipMessage();
-    var rspString = data.src!;
+    List<String> finalLines = [];
     //response.Parse(data.src!);
     var lines = data.src!.split('\r\n');
     lines[0] = SipMessageTypes.OK;
@@ -139,17 +188,36 @@ class ReqHandler {
     //     ";transport=UDP>");
 
     //response.setHeader(SipMessageTypes.OK);
-    response.Req.Src = SipMessageTypes.OK;
-    response.Via[0].Src = response.Via[0].Src!.replaceFirst(
-        response.Via[0].Src!,
-        "${response.Via[0].Src!};received=$_serverIp"); // "${response.Via[0].Src!};received=$_serverIp";
-    response.To.Src = response.To.Src!.replaceFirst(response.To.Src!,
-        "${response.To.Src!};tag=${IDGen()}"); // ";tag=" + IDGen());
+    bool viaAdded = false;
+    finalLines.add(SipMessageTypes.OK);
+    bool toHeaderAdded = false;
+    String toTag;
+    print("Request: ${data.src}");
 
-    response.Contact.Src =
-        "<sip:${data.From.User!}@$_serverIp:$_serverPort;transport=UDP>";
-    // print(response.toString());
-    //endHandle(response.getFromNumber(), response);
+    for (int x = 1; x < lines.length; x++) {
+      if (lines[x].toLowerCase().contains("via") &&
+          viaAdded &&
+          data.Via[0].Host == _serverIp) {
+        lines[x] =
+            lines[x].replaceFirst(lines[x], "${lines[x]};received=$_serverIp");
+
+        viaAdded = true;
+      } else if (lines[x].toLowerCase().contains("to")) {
+        lines[x] =
+            lines[x].replaceFirst(lines[x], "${lines[x]};tag=${IDGen()}");
+        finalLines.add(lines[x]);
+        toHeaderAdded = false;
+      } else if (lines[x].toLowerCase().contains("contact")) {
+        lines[x] =
+            "Contact: <sip:${data.From.User!}@$_serverIp:$_serverPort;transport=UDP>";
+      } else {
+        finalLines.add(lines[x]);
+      }
+    }
+
+    print(finalLines.join("\r\n"));
+    socket.send(finalLines.join("\r\n").codeUnits,
+        InternetAddress(data.transport!.addr), data.transport!.port);
 
     if (isUnregisterReq) {
       SipClient newClient = SipClient(data.From.User!, data.transport!);

@@ -66,8 +66,8 @@ class SipServer {
         Datagram? d = socket.receive();
         if (d != null) {
           //String message = String.fromCharCodes(d.data);
-          //String message = utf8.decode(d.data.toList(), allowMalformed: true);
-          String message = ascii.decode(d.data.toList(), allowInvalid: true);
+          String message = utf8.decode(d.data.toList(), allowMalformed: true);
+          //String message = ascii.decode(d.data.toList(), allowInvalid: true);
           //print(
           //    'Datagram from ${d.address.address}:${d.port}: ${message.trim()}');
 
