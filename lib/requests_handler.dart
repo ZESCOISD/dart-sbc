@@ -30,6 +30,8 @@ String IDGen() {
 class ReqHandler {
   int _serverPort;
   Map<String, SipClient> _clients = {};
+
+  Map<String, sockaddr_in> transactions = {};
   Map<String, Function(SipMessage)> handlers = {};
   void Function(sockaddr_in, dynamic)? _onHandled;
   String _serverIp;
@@ -72,25 +74,46 @@ class ReqHandler {
 
   void handle(SipMessage request, sockaddr_in protocol) {
     // print(request.getType());
-    print(request.Req.Method);
+    // print(request.Req.Method);
 
     // ignore: curly_braces_in_flow_control_structures
-    if (request.Req.Method !=
-        // ignore: curly_braces_in_flow_control_structures
-        null) if (handlers[request.Req.Method!.toLowerCase()] != null) {
-      handlers[request.Req.Method!.toLowerCase()]!(request);
-      // print(request.getType());
-      // try {
-      //   handlers[request.getType().toLowerCase()]!(request);
-      // } catch (error) {
-      //   // print(error);
-      // }
+    if (request.Req.Method != null) {
+      if (handlers[request.Req.Method!.toLowerCase()] != null) {
+        //print(request.src);
+        //var lines = request.src!.split(SipMessageHeaders.HEADERS_DELIMETER);
+        //var lines = request.src!.split(SipMessageHeaders.HEADERS_DELIMETER);
+        // print("Lines length: ${lines[8]}");
+        //handlers[request.Req.Method!.toLowerCase()]!(request);
+        proxy(request);
+      }
     }
   }
 
+  void proxy(SipMessage msg) {
+    //socket.send(buffer, address, port)
+    print(msg.Req.Method);
+    //print(msg.src);
+    //print("Branch: ${msg.Via[0].Branch}");
+
+    //print("Message from: ${msg.transport!.addr}");
+
+    if (msg.transport!.addr != "10.43.0.55") {
+      //print("Message to: ${msg.transport!.addr}");
+      transactions[msg.Via[0].Branch!] = msg.transport!;
+      socket.send(msg.src!.codeUnits, InternetAddress("10.43.0.55"), 5080);
+    } else {
+      print("Branch: ${transactions[msg.Via[0].Branch!]!.addr}");
+      //   socket.send(msg.src!.codeUnits, InternetAddress(msg.transport!.addr),
+      //       msg.transport!.port);
+      //   print("Message to: ${msg.transport!.addr}");
+    }
+    //endHandle(destNumber, message)
+  }
+
   bool OnRegister(SipMessage data) {
-    print(data.Exp.Src);
-    bool isUnregisterReq = data.Exp.Src!.contains("expires=0");
+    //print(data.src);
+    print(data.Exp.Value);
+    bool isUnregisterReq = data.Exp.Value!.contains("expires=0");
 
     if (!isUnregisterReq) {
       //print("Number ${data.getFromNumber()}");
@@ -100,8 +123,11 @@ class ReqHandler {
 
     //SipMessage response = SipMessage(data.src!, data.getSource());
     SipMessage response = SipMessage();
-    response.Parse(data.src!);
-    // response.setHeader(SipMessageTypes.OK);
+    var rspString = data.src!;
+    //response.Parse(data.src!);
+    var lines = data.src!.split('\r\n');
+    lines[0] = SipMessageTypes.OK;
+    //print(data.To.Src);
     // response.setVia(data.getVia() + ";received=" + _serverIp);
     // response.setTo(data.getTo() + ";tag=" + IDGen());
     // response.setContact("Contact: <sip:" +
@@ -112,15 +138,16 @@ class ReqHandler {
     //     _serverPort.toString() +
     //     ";transport=UDP>");
 
-    response.Parse(data.src!);
     //response.setHeader(SipMessageTypes.OK);
     response.Req.Src = SipMessageTypes.OK;
-    response.Via[0].Src = "${response.Via[0].Src!};received=$_serverIp";
-    //response.setVia(data.getVia() + ";received=" + _serverIp);
+    response.Via[0].Src = response.Via[0].Src!.replaceFirst(
+        response.Via[0].Src!,
+        "${response.Via[0].Src!};received=$_serverIp"); // "${response.Via[0].Src!};received=$_serverIp";
+    response.To.Src = response.To.Src!.replaceFirst(response.To.Src!,
+        "${response.To.Src!};tag=${IDGen()}"); // ";tag=" + IDGen());
 
-    response.To.Src = "${response.To.Src!};tag=${IDGen()}";
     response.Contact.Src =
-        "Contact: <sip:${data.From.User!}@$_serverIp:$_serverPort;transport=UDP>";
+        "<sip:${data.From.User!}@$_serverIp:$_serverPort;transport=UDP>";
     // print(response.toString());
     //endHandle(response.getFromNumber(), response);
 

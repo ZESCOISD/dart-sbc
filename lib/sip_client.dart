@@ -1,4 +1,4 @@
-import 'addr_port.dart';
+import 'package:dart_sip_parser/sip.dart';
 
 class SipClient {
   SipClient(String number, sockaddr_in address)
