@@ -16,7 +16,7 @@ class wssSipServer {
       ..usePrivateKey(key, password: 'dartdart');
 
     HttpServer.bindSecure(ip, port, context).then((server) async {
-      print('Listening on ws://${server.address.address}:${server.port}');
+      //print('Listening on ws://${server.address.address}:${server.port}');
 
       await for (HttpRequest request in server) {
         request.response.headers.set("Sec-WebSocket-Protocol", "sip");
@@ -35,13 +35,13 @@ class wssSipServer {
     RawDatagramSocket udpClient =
         await RawDatagramSocket.bind(InternetAddress(udpServerIp), 0);
     //   .then((RawDatagramSocket socket) {
-    print('UDP client ready to receive');
-    print('${udpClient.address.address}:${udpClient.port}');
+    //print('UDP client ready to receive');
+    //print('${udpClient.address.address}:${udpClient.port}');
 
     //handler = ReqHandler(socket.address.address, socket.port, socket);
 
     onNewMessageFromWS(String data) {
-      // print(data);
+      // //print(data);
       udpClient.send(data.toString().codeUnits, InternetAddress(udpServerIp),
           udpServerPort);
     }
@@ -52,15 +52,15 @@ class wssSipServer {
 
     socket.listen(
       (data) {
-        print('Received: $data');
+        //print('Received: $data');
         onNewMessageFromWS(data);
         //socket.add('Echo: ${json.encode(resp)}');
       },
       onDone: () {
-        print('Connection closed');
+        //print('Connection closed');
       },
       onError: (error) {
-        print('Error: $error');
+        //print('Error: $error');
       },
     );
 
@@ -68,7 +68,7 @@ class wssSipServer {
       Datagram? d = udpClient.receive();
       if (d != null) {
         String message = String.fromCharCodes(d.data);
-        //print(
+        ////print(
         //    'Datagram from ${d.address.address}:${d.port}: ${message.trim()}');
 
         onNewMessageFromSipServer(message);

@@ -69,7 +69,7 @@ class DigestAuthentication {
         return _ha1;
 
       default:
-        print('get() | cannot get ' + parameter.toString() + ' parameter');
+        //print('get() | cannot get ' + parameter.toString() + ' parameter');
 
         return null;
     }
@@ -186,7 +186,7 @@ class DigestAuthentication {
       a2 = '$_method}:$_uri';
       ha2 = calculateMD5(a2);
 
-      print('authenticate() | using qop=auth [a2:$a2]');
+      //print('authenticate() | using qop=auth [a2:$a2]');
 
       // Response = MD5(HA1:nonce:nonceCount:credentialsNonce:qop:HA2).
       _response = calculateMD5('$_ha1:$_nonce:$_ncHex:$_cnonce:auth:$ha2');
@@ -195,7 +195,7 @@ class DigestAuthentication {
       a2 = '${_method}:$_uri:${calculateMD5(body ?? '')}';
       ha2 = calculateMD5(a2);
 
-      print('authenticate() | using qop=auth-int [a2:$a2]');
+      //print('authenticate() | using qop=auth-int [a2:$a2]');
 
       // Response = MD5(HA1:nonce:nonceCount:credentialsNonce:qop:HA2).
       _response = calculateMD5('$_ha1:$_nonce:$_ncHex:$_cnonce:auth-int:$ha2');
@@ -204,13 +204,13 @@ class DigestAuthentication {
       a2 = '$_method}:$_uri';
       ha2 = calculateMD5(a2);
 
-      print('authenticate() | using qop=null [a2:$a2]');
+      //print('authenticate() | using qop=null [a2:$a2]');
 
       // Response = MD5(HA1:nonce:HA2).
       _response = calculateMD5('$_ha1:$_nonce:$ha2');
     }
 
-    print('authenticate() | response generated');
+    //print('authenticate() | response generated');
 
     return true;
   }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dart_sip_parser/sip.dart';
 
+import 'config/dispartcher.dart';
 import "requests_handler.dart";
 //import 'SipMessage.dart';
 //import "SipMessageFactory.dart";
@@ -22,8 +23,8 @@ class SipServer {
 
     RawDatagramSocket.bind(InternetAddress(ip), port)
         .then((RawDatagramSocket socket) {
-      print('UDP Echo ready to receive');
-      print('${socket.address.address}:${socket.port}');
+      //print('UDP Echo ready to receive');
+      //print('${socket.address.address}:${socket.port}');
 
       handler = ReqHandler(socket.address.address, socket.port, socket);
 
@@ -41,6 +42,7 @@ class SipServer {
       //     "User-Agent: Z 5.6.1 v2.10.19.9\r\n" +
       //     "Allow-Events: presence, kpml, talk, as-feature-event\r\n" +
       //     "Content-Length: 0\r\n";
+      initDispatcher();
 
       socket.listen((RawSocketEvent e) {
         dynamic onHandled(sockaddr_in dest, SipMessage message) {
@@ -51,7 +53,7 @@ class SipServer {
         }
 
         onNewMessage(String data, sockaddr_in src) {
-          // print(data);
+          // //print(data);
           //dynamic msg = SipMessage(data, src) as dynamic;
           SipMessage msg = SipMessage(); //data, src) as dynamic;
           msg.transport = src;
@@ -59,7 +61,7 @@ class SipServer {
           //if (msg.isValidMessage()) {
           handler!.handle(msg, src);
           //} else {
-          // print("Invalid message");
+          // //print("Invalid message");
           //}
         }
 
@@ -68,12 +70,12 @@ class SipServer {
           //String message = String.fromCharCodes(d.data);
           String message = utf8.decode(d.data.toList(), allowMalformed: true);
           //String message = ascii.decode(d.data.toList(), allowInvalid: true);
-          //print(
+          ////print(
           //    'Datagram from ${d.address.address}:${d.port}: ${message.trim()}');
 
-          // print("\r\n");
+          // //print("\r\n");
           sockaddr_in src = sockaddr_in(d.address.address, d.port, 'udp');
-          // print(
+          // //print(
           //     "New message from ${d.address.address}:${d.port} message: $message");
 
           onNewMessage(message, src);
@@ -85,7 +87,7 @@ class SipServer {
 
         // Where:
         // sendStatus(Timer timer) {
-        //   //print(resp);
+        //   ////print(resp);
         //   socket.send(
         //       message.toString().codeUnits, InternetAddress("127.0.0.1"), 5080);
         // }

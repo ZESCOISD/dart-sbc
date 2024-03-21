@@ -46,14 +46,14 @@ Future<WebSocket> connect() async {
 
   HttpClientRequest request = await client.getUrl(uri);
   request.headers.add('connection', 'Upgrade');
-  //print('Hello');
+  ////print('Hello');
   request.headers.add('upgrade', 'websocket');
   request.headers.add('Sec-WebSocket-Version', '13');
   //request.headers.add('WebSocket-Version', '13');
   request.headers.add('Sec-WebSocket-Key', key);
   //HttpClientResponse response = await request.close();
   HttpClientResponse response = await request.close();
-  //print(response);
+  ////print(response);
 
   // Socket socket = await response.detachSocket();
 
@@ -63,14 +63,14 @@ Future<WebSocket> connect() async {
 
   // ws.listen((event) {
   // var e = json.decode(event);
-  // //print(e['type']);
+  // ////print(e['type']);
 
   // Function? func = app[e['type']];
   // func!.call(e);
   // });
   //ws.listen(onData(//), onMessage, onDone: connectonClosed);
   // void on("StasisStart") {
-  // print("Hello");
+  // //print("Hello");
   // }
   // ws.listen((event) {
   // var e = json.decode(event);

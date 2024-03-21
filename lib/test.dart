@@ -1,10 +1,10 @@
 // ignore: unused_local_variable
   // wsSipServer wsServer =
   //     wsSipServer("192.168.0.91", 8088, "192.168.0.91", 5080);
-  //print("Connecting to Ion SFU");
+  ////print("Connecting to Ion SFU");
   //var socket = connect();
   // socket.listen((event) {
-  //   print(event);
+  //   //print(event);
   // });
 
   var offer = """v=0
@@ -118,7 +118,7 @@ a=ssrc:2432199953 label:HnAeVefwdG64baIr9EdbXNwEChe67aSRJFcW10
   //   "id": 1
   // };
 
-  //print("sending data");
+  ////print("sending data");
 //try {
   var r = Random();
   var key = base64.encode(List<int>.generate(8, (_) => r.nextInt(255)));
@@ -149,12 +149,12 @@ a=ssrc:2432199953 label:HnAeVefwdG64baIr9EdbXNwEChe67aSRJFcW10
     protocol: 'signaling',
     serverSide: false,
   );
-  print("listening for events from ION SFU");
+  //print("listening for events from ION SFU");
   webSocket!.listen((event) {
-    print("From SFU: $event");
+    //print("From SFU: $event");
   });
 
-  print("send data to SFU");
+  //print("send data to SFU");
   //webSocket.add(jsonEncode(data));
   // } catch (e) {
   //log.error(e);

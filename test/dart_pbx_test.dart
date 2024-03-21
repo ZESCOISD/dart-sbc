@@ -22,7 +22,7 @@ void main() {
 
   SipMessage sipMsg = SipMessage();
   sipMsg.Parse(register);
-  print("Expires header value: ${sipMsg.Exp.Value}");
+  //print("Expires header value: ${sipMsg.Exp.Value}");
 
-  //print(register);
+  ////print(register);
 }

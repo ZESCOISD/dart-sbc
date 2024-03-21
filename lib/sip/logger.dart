@@ -121,18 +121,18 @@ class MyLogPrinter extends LogPrinter {
         }
       }
 
-    print(color(
+    //print(color(
         '[$formattedDate] ${event.level} ${StackTraceNJ(skipFrames: depth).formatStackTrace(methodCount: 1)} ::: ${event.message}'));
     if (event.error != null) {
-      print('${event.error}');
+      //print('${event.error}');
     }
 
     if (event.stackTrace != null) {
       if (event.stackTrace.runtimeType == StackTraceNJ) {
         StackTraceNJ st = event.stackTrace as StackTraceNJ;
-        print(color('$st'));
+        //print(color('$st'));
       } else {
-        print(color('${event.stackTrace}'));
+        //print(color('${event.stackTrace}'));
       }
     }
 
