@@ -29,7 +29,7 @@ void main() async {
   String udpIp = env['UPD_SERVER_ADDRESS']!;
   int udpPort = int.parse(env['UDP_SERVER_PORT']!);
 
-  initDispatcher();
+
 
   //SipServer sipServer =
   SipServer(udpIp, udpPort);

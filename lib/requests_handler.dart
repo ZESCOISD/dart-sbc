@@ -114,10 +114,13 @@ class ReqHandler {
         dialogs[msg.CallId.Value!] = Dialog(msg.CallId.Value!);
         if (msg.Via[0].Branch != null && msg.Req.Method != null) {
           print(
-              "Creating transaction in dialog for call ID: ${msg.CallId.Value}. Transaction ID: ${msg.Via[0].Branch}");
+              "Creating transaction in dialog for call ID: ${msg.CallId.Value}. Transaction ID: ${msg.Via[0].Branch}. Method: ${msg.Req.Method}");
           //transactions[msg.Via[0].Branch!] = msg.transport!;
           dialogs[msg.CallId.Value!]!.transactions[msg.Via[0].Branch!] =
               Transaction(msg);
+          if (msg.Req.Method!.toLowerCase() == "invite") {
+            dialogs[msg.CallId.Value!]!.caller = msg;
+          }
         }
       } else {
         if (msg.Via[0].Branch != null) {
@@ -147,7 +150,21 @@ class ReqHandler {
       }
     }
 
-    if (msg.transport!.addr != "10.43.0.55") {
+    bool bye = false;
+    if (msg.Req.Method != null) {
+      if (msg.Req.Method!.toLowerCase() == "bye") {
+        bye = true;
+      }
+    }
+
+    bool ack = false;
+    if (msg.Req.Method != null) {
+      if (msg.Req.Method!.toLowerCase() == "ack") {
+        ack = true;
+      }
+    }
+
+    if (msg.transport!.addr != "10.43.0.55" || bye || ack) {
       print("Message to: ${msg.transport!.addr}");
       var lines = msg.src!.split("\r\n");
       String via;
@@ -162,7 +179,7 @@ class ReqHandler {
           viaAdded = true;
           if (msg.Req.Method != null) {
             if (msg.Req.Method!.toLowerCase() == "invite") {
-              //finalLines.add("Record-Route: <sip:$_serverIp:$_serverPort;lr>");
+              finalLines.add("Record-Route: <sip:$_serverIp:$_serverPort;lr>");
             }
           }
           finalLines.add(via);
@@ -171,10 +188,44 @@ class ReqHandler {
           finalLines.add(lines[x]);
         }
       }
-      if (msg.Req.Method != null) {
-        if (msg.Req.Method!.toLowerCase() == "invite") {
-          ////print(finalLines.join("\r\n"));
+      if (bye) {
+        String caller = dialogs[msg.CallId.Value!]!.caller!.From.User!;
+        if (msg.From.User != caller) {
+          socket.send(
+              finalLines.join("\r\n").codeUnits,
+              InternetAddress(dialogs[msg.CallId.Value!]!.caller!.Via[0].Host!),
+              int.parse(dialogs[msg.CallId.Value!]!.caller!.Via[0].Port!));
+
+          return;
         }
+        // != msg.From.User) {
+        ////print(finalLines.join("\r\n"));
+
+        // if (ack) {
+        //   String caller = dialogs[msg.CallId.Value!]!.caller!.From.User!;
+        //   if (msg.From.User != caller) {
+        //     // socket.send(
+        //     //     finalLines.join("\r\n").codeUnits,
+        //     //     InternetAddress(dialogs[msg.CallId.Value!]!.caller!.Via[0].Host!),
+        //     //     int.parse(dialogs[msg.CallId.Value!]!.caller!.Via[0].Port!));
+
+        //     socket.send(
+        //         finalLines.join("\r\n").codeUnits,
+        //         InternetAddress(dialogs[msg.CallId.Value!]!
+        //             .transactions[msg.Via[1].Branch]!
+        //             .request
+        //             .Via[0]
+        //             .Host!),
+        //         int.parse(dialogs[msg.CallId.Value!]!
+        //             .transactions[msg.Via[1].Branch]!
+        //             .request
+        //             .Via[0]
+        //             .Port!));
+
+        //     return;
+        //   }
+        // != msg.From.User) {
+        ////print(finalLines.join("\r\n"));
       }
 
       // SipMessage response = SipMessage();
