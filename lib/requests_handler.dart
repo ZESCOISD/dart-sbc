@@ -157,14 +157,47 @@ class ReqHandler {
       }
     }
 
-    bool ack = false;
-    if (msg.Req.Method != null) {
-      if (msg.Req.Method!.toLowerCase() == "ack") {
-        ack = true;
+    bool ok = false;
+    if (msg.Req.StatusCode != null) {
+      if (msg.Req.StatusCode!.toLowerCase() == "200") {
+        ok = true;
+        String? method = dialogs[msg.CallId.Value!]!
+            .transactions[msg.Via[1].Branch]!
+            .request
+            .Req
+            .Method;
+
+        if (method != null && method.toLowerCase() == "bye") {
+          print(msg.src);
+        }
       }
     }
 
-    if (msg.transport!.addr != "10.43.0.55" || bye || ack) {
+    // if (ack) {
+    //   String caller = dialogs[msg.CallId.Value!]!.caller!.From.User!;
+    //   if (msg.From.User != caller) {
+    //     // socket.send(
+    //     //     finalLines.join("\r\n").codeUnits,
+    //     //     InternetAddress(dialogs[msg.CallId.Value!]!.caller!.Via[0].Host!),
+    //     //     int.parse(dialogs[msg.CallId.Value!]!.caller!.Via[0].Port!));
+
+    //     socket.send(
+    //         finalLines.join("\r\n").codeUnits,
+    //         InternetAddress(dialogs[msg.CallId.Value!]!
+    //             .transactions[msg.Via[1].Branch]!
+    //             .request
+    //             .Via[0]
+    //             .Host!),
+    //         int.parse(dialogs[msg.CallId.Value!]!
+    //             .transactions[msg.Via[1].Branch]!
+    //             .request
+    //             .Via[0]
+    //             .Port!));
+
+    //     return;
+    //   }
+
+    if (msg.transport!.addr != "10.43.0.55" || bye) {
       print("Message to: ${msg.transport!.addr}");
       var lines = msg.src!.split("\r\n");
       String via;
@@ -178,7 +211,8 @@ class ReqHandler {
           ////print("Create via: $via");
           viaAdded = true;
           if (msg.Req.Method != null) {
-            if (msg.Req.Method!.toLowerCase() == "invite") {
+            if (msg.Req.Method!.toLowerCase() == "invite" ||
+                msg.Req.Method!.toLowerCase() == "bye") {
               finalLines.add("Record-Route: <sip:$_serverIp:$_serverPort;lr>");
             }
           }
