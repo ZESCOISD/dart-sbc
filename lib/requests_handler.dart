@@ -9,7 +9,7 @@ import 'package:dart_sip_parser/sip_message_types.dart';
 import 'globals.dart';
 //import "SipMessage.dart";
 import "sip_client.dart";
-import "Session.dart";
+import "session.dart";
 import 'dart:io';
 
 import 'dart:convert';
