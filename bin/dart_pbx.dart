@@ -26,7 +26,7 @@ void main() async {
       env['WS_SERVER_PORT'] != null ? int.parse(env['WS_SERVER_PORT']!) : null;
 
   String? secureTcpIp = env['SEC_TCP_SERVER_ADDRESS'];
-  int? secureTcpPort = env['SEC_TCP_SERVER_ADDRESS'] != null
+  int? secureTcpPort = env['SEC_TCP_SERVER_PORT'] != null
       ? int.parse(env['SEC_TCP_SERVER_PORT']!)
       : null;
   String? path_to_certificate_file = env['PATH_TO_CERTIFICATE_FILE_PEM'];
