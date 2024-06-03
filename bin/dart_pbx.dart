@@ -21,7 +21,7 @@ import '../lib/config/dispartcher.dart';
 void main() async {
   var env = DotEnv(includePlatformEnvironment: true)..load();
 
-  String? wsIp = env['WS_SERVER_PORT'];
+  String? wsIp = env['WS_SERVER_ADDRESS'];
   int? wsPort =
       env['WS_SERVER_PORT'] != null ? int.parse(env['WS_SERVER_PORT']!) : null;
 
