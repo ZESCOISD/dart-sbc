@@ -25,9 +25,7 @@ class SecureTcpSipServer {
 
     // Listen for connections and handle them asynchronously
     await for (var socket in server) {
-      //handleConnection(socket);
-      // Handle TLS connections
-      handleTLSSecureConnection(socket);
+      handleConnection(socket);
     }
   }
 
@@ -49,32 +47,5 @@ class SecureTcpSipServer {
       // Handle when the client disconnects
       print('Client disconnected');
     });
-  }
-
-  void handleTLSSecureConnection(SecureSocket socket) {
-    print(
-        'TLS connection from ${socket.remoteAddress.address}:${socket.remotePort}');
-
-    socket.listen((List<int> data) {
-      // Handle incoming data
-      print('Received (TLS): ${String.fromCharCodes(data)}');
-      // Echo the received data back to the client
-      //socket.write('Server echo (TLS): ${String.fromCharCodes(data)}');
-    }, onError: (error) {
-      // Handle errors
-      print('Error (TLS): $error');
-    }, onDone: () {
-      // Handle when the client disconnects
-      print('Client disconnected (TLS)');
-    });
-  }
-
-  void handleNonTLSSecureConnection(Socket socket) {
-    print(
-        'Non-TLS connection from ${socket.remoteAddress.address}:${socket.remotePort}');
-
-    // Close the non-TLS connection immediately
-    socket.close();
-    print('Connection closed (Non-TLS)');
   }
 }
