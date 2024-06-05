@@ -27,7 +27,11 @@ class SecureTcpSipServer {
     await for (var socket in server) {
       //handleConnection(socket);
       // Handle TLS connections
-      handleTLSSecureConnection(socket);
+      try {
+        handleTLSSecureConnection(socket);
+      } catch (exception) {
+        print("Error: $exception");
+      }
     }
   }
 
