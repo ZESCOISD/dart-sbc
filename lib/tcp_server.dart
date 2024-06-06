@@ -24,14 +24,15 @@ class SecureTcpSipServer {
     print('Server listening on port ${server.port}');
 
     // Listen for connections and handle them asynchronously
-    await for (var socket in server) {
-      //handleConnection(socket);
-      // Handle TLS connections
-      try {
+    try {
+      await for (var socket in server) {
+        //handleConnection(socket);
+        // Handle TLS connections
+        //try {
         handleTLSSecureConnection(socket);
-      } catch (exception) {
-        print("Error: $exception");
       }
+    } catch (exception) {
+      print("Error: $exception");
     }
   }
 
