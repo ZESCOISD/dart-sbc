@@ -39,20 +39,20 @@ class SecureTcpSipServer {
     print(
         'Connection from ${socket.remoteAddress.address}:${socket.remotePort}');
 
-    socket.listen((List<int> data) {
-      // Handle incoming data
-      var dataFromSocket = String.fromCharCodes(data);
-      print('Received: $dataFromSocket');
-      //print(object)
-      // Echo the received data back to the client
-      //socket.write('Server echo: ${String.fromCharCodes(data)}');
-    }, onError: (error) {
-      // Handle errors
-      print('Error: $error');
-    }, onDone: () {
-      // Handle when the client disconnects
-      print('Client disconnected');
-    });
+    // socket.listen((List<int> data) {
+    //   // Handle incoming data
+    //   var dataFromSocket = String.fromCharCodes(data);
+    //   print('Received: $dataFromSocket');
+    //   //print(object)
+    //   // Echo the received data back to the client
+    //   //socket.write('Server echo: ${String.fromCharCodes(data)}');
+    // }, onError: (error) {
+    //   // Handle errors
+    //   print('Error: $error');
+    // }, onDone: () {
+    //   // Handle when the client disconnects
+    //   print('Client disconnected');
+    // });
   }
 
   void handleTLSSecureConnection(SecureSocket socket) {
