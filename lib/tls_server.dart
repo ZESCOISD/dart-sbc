@@ -24,22 +24,26 @@ class TlsSipServer {
             'Client connected from ${clientSocket.remoteAddress}:${clientSocket.remotePort}');
 
         //SecureServerSocket.secureServer();
-        final secureSocket =
-            await SecureSocket.secure(clientSocket, context: serverContext);
+        try {
+          final secureSocket =
+              await SecureSocket.secure(clientSocket, context: serverContext);
 
-        // Handle data from the client
-        secureSocket.listen((List<int> data) {
-          final receivedData = String.fromCharCodes(data).trim();
-          print('Received data: $receivedData');
+          // Handle data from the client
+          secureSocket.listen((List<int> data) {
+            final receivedData = String.fromCharCodes(data).trim();
+            print('Received data: $receivedData');
 
-          // Send a response back to the client
-          secureSocket.write('Hello from server!\n');
-        });
+            // Send a response back to the client
+            secureSocket.write('Hello from server!\n');
+          });
 
-        // Handle client disconnection
-        secureSocket.done.then((_) {
-          print('Client disconnected.');
-        });
+          // Handle client disconnection
+          secureSocket.done.then((_) {
+            print('Client disconnected.');
+          });
+        } catch (exception) {
+          print("error: $exception");
+        }
       });
     }).catchError((error) {
       print('Error creating server: $error');
