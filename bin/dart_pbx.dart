@@ -2,6 +2,7 @@ import 'package:dart_pbx/dart_pbx.dart' as dart_pbx;
 
 import 'package:dart_pbx/sip_server.dart';
 import 'package:dart_pbx/tcp_server.dart';
+import 'package:dart_pbx/tls_server.dart';
 import 'dart:io';
 import 'package:dart_pbx/ws_sip_server.dart';
 //import 'signal_jsonrpc_impl.dart' as ion;
@@ -49,8 +50,13 @@ void main() async {
   //wssSipServer(wssIp, wssPort, udpIp, udpPort);
 
   //wssSipServer(secureTcpIp, secureTcpPort, udpIp, udpPort);
+  // if (secureTcpIp != null) {
+  //   SecureTcpSipServer(secureTcpIp, secureTcpPort!, path_to_certificate_file!,
+  //       path_to_private_key_file!);
+  // }
+
   if (secureTcpIp != null) {
-    SecureTcpSipServer(secureTcpIp, secureTcpPort!, path_to_certificate_file!,
+    TlsSipServer(secureTcpIp, secureTcpPort!, path_to_certificate_file!,
         path_to_private_key_file!);
   }
   // var ion_webscket = ion.SimpleWebSocket("wss://dev.zesco.co.zm:7881/ws");
