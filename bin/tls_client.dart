@@ -10,7 +10,12 @@ void main() async {
   String server_address = "10.43.0.55";
 
   try {
-    Socket socket = await SecureSocket.connect(server_address, server_port);
+    Socket socket = await SecureSocket.connect(server_address, server_port
+        //,
+        //   onBadCertificate: (certificate) {
+        // return true;
+        //}
+        );
 
     socket.listen((List<int> data) {
       // Handle incoming data from the server
