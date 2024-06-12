@@ -50,15 +50,16 @@ void main() async {
   //wssSipServer(wssIp, wssPort, udpIp, udpPort);
 
   //wssSipServer(secureTcpIp, secureTcpPort, udpIp, udpPort);
-  // if (secureTcpIp != null) {
-  //   SecureTcpSipServer(secureTcpIp, secureTcpPort!, path_to_certificate_file!,
-  //       path_to_private_key_file!);
-  // }
 
   if (secureTcpIp != null) {
-    TlsSipServer(secureTcpIp, secureTcpPort!, path_to_certificate_file!,
+    SecureTcpSipServer(secureTcpIp, secureTcpPort!, path_to_certificate_file!,
         path_to_private_key_file!);
   }
+
+  // if (secureTcpIp != null) {
+  //   TlsSipServer(secureTcpIp, secureTcpPort!, path_to_certificate_file!,
+  //       path_to_private_key_file!);
+  // }
   // var ion_webscket = ion.SimpleWebSocket("wss://dev.zesco.co.zm:7881/ws");
   // await ion_webscket.connect();
 

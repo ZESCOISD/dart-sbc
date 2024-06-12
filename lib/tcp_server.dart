@@ -35,9 +35,14 @@ class SecureTcpSipServer {
     //   print("Error: $exception");
     // }
 
-    server.listen((SecureSocket client) {
-      handleTLSSecureConnection(client);
-    }, cancelOnError: false);
+    server.listen(
+        (SecureSocket client) {
+          handleTLSSecureConnection(client);
+        },
+        cancelOnError: false,
+        onError: (error, stack) {
+          print("{Error: $error, stacktrace: $stack}");
+        });
   }
 
   void handleConnection(SecureSocket socket) {
