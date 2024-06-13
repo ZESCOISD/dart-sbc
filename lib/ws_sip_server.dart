@@ -3,7 +3,7 @@ import 'dart:io';
 class WsSipServer {
   WsSipServer(this.ip, this.port, this.udpServerIp, this.udpServerPort) {
     HttpServer.bind(ip, port).then((server) async {
-      //print('Listening on ws://${server.address.address}:${server.port}');
+      print('Listening on ws://${server.address.address}:${server.port}');
 
       await for (HttpRequest request in server) {
         request.response.headers.set("Sec-WebSocket-Protocol", "sip");

@@ -24,7 +24,7 @@ class SipServer {
     RawDatagramSocket.bind(InternetAddress(ip), port)
         .then((RawDatagramSocket socket) {
       //print('UDP Echo ready to receive');
-      //print('${socket.address.address}:${socket.port}');
+      print('listening on udp:${socket.address.address}:${socket.port}');
 
       handler = ReqHandler(socket.address.address, socket.port, socket);
 

@@ -25,7 +25,7 @@ class SecureTcpSipServer {
     // Create a server socket using the security context
     var server = await SecureServerSocket.bind(tcpIp, tcpPort, serverContext);
 
-    print('Server listening on port ${server.port}');
+    print('Server listening on port tls:${server.address.address}:${server.port}');
 
     // Listen for connections and handle them asynchronously
     // try {

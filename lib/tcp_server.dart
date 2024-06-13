@@ -13,7 +13,7 @@ class TcpSipServer {
   }
   void connect() {
     ServerSocket.bind(tcpIp, tcpPort).then((serverSocket) {
-      print('Server listening on ${serverSocket.address}:${serverSocket.port}');
+      print('Server listening on tcp:${serverSocket.address.address}:${serverSocket.port}');
 
       serverSocket.listen((Socket clientSocket) async {
         print(
