@@ -4,10 +4,11 @@ import 'dart:io';
 class TcpSipServer {
   String tcpIp; // = env['WS_SERVER_ADDRESS']!;
   int tcpPort; // = int.parse(env['WS_SERVER_PORT']!);
-  // String path_to_certificate_file;
-  // String path_to_private_key_file;
 
-  TcpSipServer(this.tcpIp, this.tcpPort) {
+  String udpServerIp;
+  int udpServerPort;
+
+  TcpSipServer(this.tcpIp, this.tcpPort, this.udpServerIp, this.udpServerPort) {
     connect();
   }
   void connect() {

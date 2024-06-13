@@ -5,10 +5,14 @@ import 'package:dotenv/dotenv.dart';
 class SecureTcpSipServer {
   String tcpIp; // = env['WS_SERVER_ADDRESS']!;
   int tcpPort; // = int.parse(env['WS_SERVER_PORT']!);
+
+  String udpServerIp;
+  int udpServerPort;
+
   String path_to_certificate_file;
   String path_to_private_key_file;
 
-  SecureTcpSipServer(this.tcpIp, this.tcpPort, this.path_to_certificate_file,
+  SecureTcpSipServer(this.tcpIp, this.tcpPort, this.udpServerIp, this.udpServerPort, this.path_to_certificate_file,
       this.path_to_private_key_file) {
     connect();
   }

@@ -65,12 +65,12 @@ void main() async {
   }
 
   if (tcpIp != null) {
-    TcpSipServer(tcpIp, tcpPort!);
+    TcpSipServer(tcpIp, tcpPort!, udpIp!, udpPort!);
   }
 
   if (secureTcpIp != null) {
-    SecureTcpSipServer(secureTcpIp, secureTcpPort!, path_to_certificate_file!,
-        path_to_private_key_file!);
+    SecureTcpSipServer(secureTcpIp, secureTcpPort!, udpIp!, udpPort!,
+        path_to_certificate_file!, path_to_private_key_file!);
   }
 
   // if (secureTcpIp != null) {

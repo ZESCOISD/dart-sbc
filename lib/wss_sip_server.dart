@@ -1,12 +1,8 @@
 import 'dart:io';
 
 class WssSipServer {
-  WssSipServer(String ip, int port, String udpServerIp, int udpServerPort,
-      this.path_to_certificate_file, this.path_to_private_key_file)
-      : this.ip = ip,
-        this.port = port,
-        this.udpServerIp = udpServerIp,
-        this.udpServerPort = udpServerPort {
+  WssSipServer(this.ip, this.port, this.udpServerIp, this.udpServerPort,
+      this.path_to_certificate_file, this.path_to_private_key_file) {
     SecurityContext serverContext = SecurityContext();
     serverContext.useCertificateChain(path_to_certificate_file);
     serverContext.usePrivateKey(path_to_private_key_file);

@@ -1,11 +1,7 @@
 import 'dart:io';
 
 class WsSipServer {
-  WsSipServer(String ip, int port, String udpServerIp, int udpServerPort)
-      : this.ip = ip,
-        this.port = port,
-        this.udpServerIp = udpServerIp,
-        this.udpServerPort = udpServerPort {
+  WsSipServer(this.ip, this.port, this.udpServerIp, this.udpServerPort) {
     HttpServer.bind(ip, port).then((server) async {
       //print('Listening on ws://${server.address.address}:${server.port}');
 
