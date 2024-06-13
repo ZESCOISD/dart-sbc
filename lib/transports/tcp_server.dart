@@ -27,6 +27,7 @@ class TcpSipServer {
 
         //SecureServerSocket.secureServer();
         msgToClient(String data) {
+          print("Sending to client");
           clientSocket.write(data);
         }
 
@@ -34,6 +35,7 @@ class TcpSipServer {
           var tx = SipTransport(
               sockaddr_in(clientSocket.remoteAddress.address,
                   clientSocket.remotePort, 'tcp'),
+              sockaddr_in(tcpIp, tcpPort, 'tcp'),
               msgToClient);
           requestsHander.handle(data, tx);
         }
@@ -45,7 +47,7 @@ class TcpSipServer {
         // Handle data from the client
         clientSocket.listen((List<int> data) {
           final receivedData = String.fromCharCodes(data).trim();
-          print('Received data: $receivedData');
+          // print('Received data: $receivedData');
 
           msgFromClient(receivedData);
 

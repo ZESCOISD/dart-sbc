@@ -42,14 +42,15 @@ class Location {
   // 	'methods' => 'int'
   // ];
   //Function(String)
-  Location(this.contact_id);
+  Location(
+      this.contact_id, this.username, this.domain, this.contact, this.socket);
 
   String contact_id;
-  String username = "";
+  String username;
   String? domain;
-  String contact = "";
+  String contact;
   String? received;
-  String path = "";
+  String? path = "";
   int expires = 0;
   double q = 0.0;
   String callid = "";
@@ -58,7 +59,7 @@ class Location {
   int flags = 0;
   String? cflags;
   String user_agent = "";
-  sockaddr_in? socket;
+  sockaddr_in socket;
   int? methods;
   String? sip_instance;
   String? kv_store;
