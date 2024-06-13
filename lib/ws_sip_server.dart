@@ -1,7 +1,7 @@
 import 'dart:io';
 
-class wsSipServer {
-  wsSipServer(String ip, int port, String udpServerIp, int udpServerPort)
+class WsSipServer {
+  WsSipServer(String ip, int port, String udpServerIp, int udpServerPort)
       : this.ip = ip,
         this.port = port,
         this.udpServerIp = udpServerIp,

@@ -6,16 +6,14 @@ void main() async {
   // // Load the certificate chain and private key
   // context.useCertificateChain('path_to_certificate.crt');
   // context.usePrivateKey('path_to_private_key.key');
-  int server_port = 5067;
-  String server_address = "10.43.0.55";
+  int server_port = 5061;
+  String server_address = "sip.pstnhub.microsoft.com";
 
   try {
-    Socket socket = await SecureSocket.connect(server_address, server_port
-        //,
-        //   onBadCertificate: (certificate) {
-        // return true;
-        //}
-        );
+    Socket socket = await SecureSocket.connect(server_address, server_port,
+        onBadCertificate: (certificate) {
+      return true;
+    });
 
     socket.listen((List<int> data) {
       // Handle incoming data from the server

@@ -1,94 +1,43 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:dotenv/dotenv.dart';
-
-class SecureTcpSipServer {
+class TcpSipServer {
   String tcpIp; // = env['WS_SERVER_ADDRESS']!;
   int tcpPort; // = int.parse(env['WS_SERVER_PORT']!);
-  String path_to_certificate_file;
-  String path_to_private_key_file;
+  // String path_to_certificate_file;
+  // String path_to_private_key_file;
 
-  SecureTcpSipServer(this.tcpIp, this.tcpPort, this.path_to_certificate_file,
-      this.path_to_private_key_file) {
+  TcpSipServer(this.tcpIp, this.tcpPort) {
     connect();
   }
-  void connect() async {
-    // Security context to specify certificate and private key files
-    SecurityContext serverContext = SecurityContext();
-    serverContext.useCertificateChain(path_to_certificate_file);
-    serverContext.usePrivateKey(path_to_private_key_file);
+  void connect() {
+    ServerSocket.bind(tcpIp, tcpPort).then((serverSocket) {
+      print('Server listening on ${serverSocket.address}:${serverSocket.port}');
 
-    // Create a server socket using the security context
-    var server = await SecureServerSocket.bind(tcpIp, tcpPort, serverContext);
+      serverSocket.listen((Socket clientSocket) async {
+        print(
+            'Client connected from ${clientSocket.remoteAddress}:${clientSocket.remotePort}');
 
-    print('Server listening on port ${server.port}');
+        //SecureServerSocket.secureServer();
 
-    // Listen for connections and handle them asynchronously
-    // try {
-    //   await for (var socket in server) {
-    //     //handleConnection(socket);
-    //     // Handle TLS connections
-    //     //try {
-    //     handleTLSSecureConnection(socket);
-    //   }
-    // } catch (exception) {
-    //   print("Error: $exception");
-    // }
+        // Handle data from the client
+        clientSocket.listen((List<int> data) {
+          final receivedData = String.fromCharCodes(data).trim();
+          print('Received data: $receivedData');
 
-    server.listen(
-        (SecureSocket client) {
-          handleTLSSecureConnection(client);
-        },
-        cancelOnError: false,
-        onError: (error, stack) {
-          print("{Error: $error, stacktrace: $stack}");
+          // Send a response back to the client
+          //clientSocket.write('Hello from server!\n');
+        }, onError: (error, stack) {
+          print("{error: $error, stack: $stack}");
         });
-  }
 
-  void handleConnection(SecureSocket socket) {
-    print(
-        'Connection from ${socket.remoteAddress.address}:${socket.remotePort}');
-
-    socket.listen((List<int> data) {
-      // Handle incoming data
-      var dataFromSocket = String.fromCharCodes(data);
-      print('Received: $dataFromSocket');
-      //print(object)
-      // Echo the received data back to the client
-      //socket.write('Server echo: ${String.fromCharCodes(data)}');
-    }, onError: (error) {
-      // Handle errors
-      print('Error: $error');
-    }, onDone: () {
-      // Handle when the client disconnects
-      print('Client disconnected');
+        // Handle client disconnection
+        clientSocket.done.then((_) {
+          print('Client disconnected.');
+        });
+      });
+    }).catchError((error) {
+      print('Error creating server: $error');
     });
-  }
-
-  void handleTLSSecureConnection(SecureSocket socket) {
-    print(
-        'TLS connection from ${socket.remoteAddress.address}:${socket.remotePort}');
-
-    socket.listen((List<int> data) {
-      // Handle incoming data
-      print('Received (TLS): ${String.fromCharCodes(data)}');
-      // Echo the received data back to the client
-      //socket.write('Server echo (TLS): ${String.fromCharCodes(data)}');
-    }, onError: (error) {
-      // Handle errors
-      print('Error (TLS): $error');
-    }, onDone: () {
-      // Handle when the client disconnects
-      print('Client disconnected (TLS)');
-    });
-  }
-
-  void handleNonTLSSecureConnection(Socket socket) {
-    print(
-        'Non-TLS connection from ${socket.remoteAddress.address}:${socket.remotePort}');
-
-    // Close the non-TLS connection immediately
-    socket.close();
-    print('Connection closed (Non-TLS)');
   }
 }

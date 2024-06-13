@@ -1,22 +1,18 @@
 import 'dart:io';
 
-class wssSipServer {
-  wssSipServer(String ip, int port, String udpServerIp, int udpServerPort)
+class WssSipServer {
+  WssSipServer(String ip, int port, String udpServerIp, int udpServerPort,
+      this.path_to_certificate_file, this.path_to_private_key_file)
       : this.ip = ip,
         this.port = port,
         this.udpServerIp = udpServerIp,
         this.udpServerPort = udpServerPort {
-    var file = File("C:/ssl/star_zesco_co_zm.crt");
-    // var chain =
-    //     Platform.script.resolve('./ssl/star_zesco_co_zm.crt').toFilePath();
-    var chain = "C:/ssl/star_zesco_co_zm.crt";
-    var key = 'C:/ssl/myserver.key';
-    var context = SecurityContext()
-      ..useCertificateChain(chain)
-      ..usePrivateKey(key, password: 'dartdart');
+    SecurityContext serverContext = SecurityContext();
+    serverContext.useCertificateChain(path_to_certificate_file);
+    serverContext.usePrivateKey(path_to_private_key_file);
 
-    HttpServer.bindSecure(ip, port, context).then((server) async {
-      //print('Listening on ws://${server.address.address}:${server.port}');
+    HttpServer.bindSecure(ip, port, serverContext).then((server) async {
+      print('Listening on wss://${server.address.address}:${server.port}');
 
       await for (HttpRequest request in server) {
         request.response.headers.set("Sec-WebSocket-Protocol", "sip");
@@ -80,4 +76,6 @@ class wssSipServer {
   int port;
   String udpServerIp;
   int udpServerPort;
+  String path_to_certificate_file;
+  String path_to_private_key_file;
 }
