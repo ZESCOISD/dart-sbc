@@ -65,7 +65,7 @@ void main() async {
   }
 
   if (tcpIp != null) {
-    TcpSipServer(tcpIp, secureTcpPort!);
+    TcpSipServer(tcpIp, tcpPort!);
   }
 
   if (secureTcpIp != null) {
