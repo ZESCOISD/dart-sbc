@@ -1,6 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dart_pbx/globals.dart';
+import 'package:dart_pbx/sip/transport.dart';
+import 'package:dart_pbx/transports/transport.dart';
+import 'package:dart_sip_parser/sip.dart';
+
 class TcpSipServer {
   String tcpIp; // = env['WS_SERVER_ADDRESS']!;
   int tcpPort; // = int.parse(env['WS_SERVER_PORT']!);
@@ -13,18 +18,34 @@ class TcpSipServer {
   }
   void connect() {
     ServerSocket.bind(tcpIp, tcpPort).then((serverSocket) {
-      print('Server listening on tcp:${serverSocket.address.address}:${serverSocket.port}');
+      print(
+          'Server listening on tcp:${serverSocket.address.address}:${serverSocket.port}');
 
       serverSocket.listen((Socket clientSocket) async {
         print(
             'Client connected from ${clientSocket.remoteAddress}:${clientSocket.remotePort}');
 
         //SecureServerSocket.secureServer();
+        msgToClient(String data) {
+          clientSocket.write(data);
+        }
+
+        msgFromClient(String data) {
+          var tx = SipTransport(sockaddr_in(clientSocket.remoteAddress.address,
+              clientSocket.remotePort, 'tcp'),msgToClient);
+          requestsHander.handle(data, tx);
+        }
+
+        // msgFromServer(String data) {
+        //   clientSocket.write(data);
+        // }
 
         // Handle data from the client
         clientSocket.listen((List<int> data) {
           final receivedData = String.fromCharCodes(data).trim();
           print('Received data: $receivedData');
+
+          msgFromClient(receivedData);
 
           // Send a response back to the client
           //clientSocket.write('Hello from server!\n');

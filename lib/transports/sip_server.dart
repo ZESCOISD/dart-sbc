@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:dart_sip_parser/sip.dart';
 
-import 'config/dispartcher.dart';
-import "requests_handler.dart";
+import '../config/dispartcher.dart';
+import "../requests_handler.dart";
 //import 'SipMessage.dart';
 //import "SipMessageFactory.dart";
 import 'dart:io';
-import 'globals.dart';
+import '../globals.dart';
 
 //import 'addr_port.dart';
 

@@ -1,13 +1,13 @@
 import 'package:dart_pbx/dart_pbx.dart' as dart_pbx;
 
-import 'package:dart_pbx/sip_server.dart';
-import 'package:dart_pbx/tls_server.dart';
-import 'package:dart_pbx/tcp_server.dart';
+import 'package:dart_pbx/transports/sip_server.dart';
+import 'package:dart_pbx/transports/tls_server.dart';
+import 'package:dart_pbx/transports/tcp_server.dart';
 import 'dart:io';
-import 'package:dart_pbx/ws_sip_server.dart';
+import 'package:dart_pbx/transports/ws_sip_server.dart';
 //import 'signal_jsonrpc_impl.dart' as ion;
 import 'package:dart_pbx/globals.dart';
-import 'package:dart_pbx/wss_sip_server.dart';
+import 'package:dart_pbx/transports/wss_sip_server.dart';
 import 'package:dart_sip_parser/sip.dart';
 
 import 'dart:async';
