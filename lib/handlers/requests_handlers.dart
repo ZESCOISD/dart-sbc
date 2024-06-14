@@ -40,16 +40,16 @@ class RequestsHandler {
   void handle(String request, SipTransport transport) {
     SipMsg sipMsg = SipMsg();
     sipMsg.Parse(request);
-    print(sipMsg.Req.Method);
-    if (sipMsg.Req.Method != null) {
+    print(request);
+    if (sipMsg.Req.Src != null) {
       print("request: ${sipMsg.Req.Method}");
       if (handlers[sipMsg.Req.Method!.toLowerCase()] != null) {
-        //print(transport.send);
+        print(transport.send);
         handlers[sipMsg.Req.Method!.toLowerCase()]!(sipMsg,
             transport: transport);
       }
     } else {
-      //print("Response: ${sipMsg.Req.StatusCode} ${sipMsg.Req.StatusDesc}");
+      print("Response: ${sipMsg.Req.StatusCode} ${sipMsg.Req.StatusDesc}");
     }
   }
 
@@ -123,73 +123,7 @@ class RequestsHandler {
   onCancel(SipMsg data, {SipTransport? transport}) {}
 
   onReqTerminated(SipMsg data, {SipTransport? transport}) {}
-  onInvite(SipMsg data, {SipTransport? transport}) {
-    print("Registering user");
-
-    List<String> finalLines = [];
-    var lines = data.src!.split('\r\n');
-    lines[0] = SipMessageTypes.NOT_IMPLEMENTED;
-    ////print(data.To.Src);
-    // response.setVia(data.getVia() + ";received=" + _serverIp);
-    // response.setTo(data.getTo() + ";tag=" + IDGen());
-    // response.setContact("Contact: <sip:" +
-    //     data.getFromNumber() +
-    //     "@" +
-    //     _serverIp +
-    //     ":" +
-    //     _serverPort.toString() +
-    //     ";transport=UDP>");
-
-    //response.setHeader(SipMessageTypes.OK);
-    bool viaAdded = false;
-    finalLines.add(SipMessageTypes.OK);
-
-    bool toHeaderAdded = false;
-    String toTag;
-    ////print("Request: ${data.src}");
-    String? contact_id;
-
-    for (int x = 1; x < lines.length; x++) {
-      if (lines[x].toLowerCase().contains("via") &&
-          //viaAdded &&
-          data.Via[0].Host == transport!.serverSocket.addr) {
-        lines[x] = lines[x].replaceFirst(
-            lines[x], "${lines[x]};received=${transport.serverSocket.addr}");
-        // print("Checking via");
-        // print(lines[x]);
-        finalLines.add(lines[x]);
-
-        viaAdded = true;
-      } else if (lines[x].toLowerCase().contains("to")) {
-        lines[x] =
-            lines[x].replaceFirst(lines[x], "${lines[x]};tag=${IDGen()}");
-        finalLines.add(lines[x]);
-        toHeaderAdded = false;
-        //print(lines[x]);
-      } else if (lines[x].toLowerCase().contains("contact")) {
-        lines[x] =
-            "Contact: <sip:${data.From.User!}@${transport?.serverSocket.addr}:${transport?.serverSocket.port};transport=${transport?.serverSocket.transport.toUpperCase()}>";
-        contact_id = lines[x];
-        //print(lines[x]);
-      } else {
-        //print("Line: ${lines[x]}");
-        finalLines.add(lines[x]);
-      }
-    }
-    finalLines.add("\r\n");
-    var response = finalLines.join("\r\n");
-    locations[contact_id!] = Location(
-        contact_id,
-        data.From.User!,
-        data.From.Host,
-        contact_id,
-        sockaddr_in(transport!.socket.addr, transport.socket.port,
-            transport.socket.transport));
-    //print(transport!.send);
-    locations[contact_id]?.send = transport.send;
-    transport.send(response);
-  }
-
+  onInvite(SipMsg data, {SipTransport? transport}) {}
   onTrying(SipMsg data, {SipTransport? transport}) {}
   onRinging(SipMsg data, {SipTransport? transport}) {}
   onBusy(SipMsg data, {SipTransport? transport}) {}

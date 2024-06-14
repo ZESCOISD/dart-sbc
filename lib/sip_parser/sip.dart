@@ -23,22 +23,29 @@ class SipMsg {
     var attr_idx = 0;
     Sdp.Attrib = []; //make([]sdpAttrib, 0, 8)
 
+    // var hdrDelimeter = SipMessageHeaders.HEADERS_DELIMETER;
+
+    // int pos = v.indexOf(SipMessageHeaders.HEADERS_DELIMETER);
+    // // print(_messageStr);
+    // // print(msg);
+    // // print(" index: $pos");
+    // if (pos == -1) return;
+    // header = v.substring(0, pos);
+
+    // v = v.substring(pos + SipMessageHeaders.HEADERS_DELIMETER.length);
+
+    // if (header!.indexOf(" ") == -1) return;
+
+    // //lines := bytes.Split(v, []byte("\r\n"))
+    // var lines = v.split(hdrDelimeter);
+    // print("Lines length: ${lines.length}");
+    // //print("Lines length: ${lines.length}");
+    // //print("Index of Headers delimiter: ${v.indexOf(delimeter)}");
+
     var hdrDelimeter = SipMessageHeaders.HEADERS_DELIMETER;
-
-    int pos = v.indexOf(SipMessageHeaders.HEADERS_DELIMETER);
-    // print(_messageStr);
-    // print(msg);
-    // print(" index: $pos");
-    if (pos == -1) return;
-    header = v.substring(0, pos);
-
-    v = v.substring(pos + SipMessageHeaders.HEADERS_DELIMETER.length);
-
-    if (header!.indexOf(" ") == -1) return;
 
     //lines := bytes.Split(v, []byte("\r\n"))
     var lines = v.split(hdrDelimeter);
-    print("Lines length: ${lines.length}");
     //print("Lines length: ${lines.length}");
     //print("Index of Headers delimiter: ${v.indexOf(delimeter)}");
 

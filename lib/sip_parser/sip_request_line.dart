@@ -27,7 +27,7 @@ class sipReq {
     // if (keep_src==true) {
     // 	Src = v;
     // }
-    //print("Request line: $v");
+    print("Request line: $v");
 //     print("""
 // Parsing Request line: ...
 //     """);
