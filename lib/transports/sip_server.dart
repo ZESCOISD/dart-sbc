@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dart_sip_parser/sip.dart';
+import 'package:dart_pbx/sip_parser/sip.dart';
 
 import '../config/dispartcher.dart';
 import "../requests_handler.dart";

@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:dart_pbx/globals.dart';
 //import 'package:dart_pbx/sip/transport.dart';
 import 'package:dart_pbx/transports/transport.dart';
-import 'package:dart_sip_parser/sip.dart';
+import 'package:dart_pbx/sip_parser/sip.dart';
 
 class TcpSipServer {
   String tcpIp; // = env['WS_SERVER_ADDRESS']!;

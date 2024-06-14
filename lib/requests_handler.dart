@@ -3,8 +3,8 @@ import 'dart:ffi';
 import 'dart:math';
 
 import 'package:dart_pbx/dialog/dialog.dart';
-import 'package:dart_sip_parser/sip_message_headers.dart';
-import 'package:dart_sip_parser/sip_message_types.dart';
+import 'package:dart_pbx/sip_parser/sip_message_headers.dart';
+import 'package:dart_pbx/sip_parser/sip_message_types.dart';
 
 import 'globals.dart';
 //import "SipMessage.dart";
@@ -15,7 +15,7 @@ import 'dart:io';
 import 'dart:convert';
 //import 'SipMessageTypes.dart';
 //import 'SipSdpMessage.dart';
-import 'package:dart_sip_parser/sip.dart';
+import 'package:dart_pbx/sip_parser/sip.dart';
 
 import 'transactions/transaction_base.dart';
 
