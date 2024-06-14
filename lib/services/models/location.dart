@@ -1,6 +1,6 @@
 import 'dart:ffi';
 
-import 'package:dart_sip_parser/sip.dart';
+import 'package:dart_pbx/sip_parser/sip.dart';
 
 /**
  * Class Location

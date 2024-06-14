@@ -8,7 +8,7 @@ import 'package:dart_pbx/transports/ws_sip_server.dart';
 //import 'signal_jsonrpc_impl.dart' as ion;
 import 'package:dart_pbx/globals.dart';
 import 'package:dart_pbx/transports/wss_sip_server.dart';
-import 'package:dart_sip_parser/sip.dart';
+import 'package:dart_pbx/sip_parser/sip.dart';
 
 import 'dart:async';
 import 'dart:convert';
