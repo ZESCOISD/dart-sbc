@@ -192,9 +192,9 @@ class SipMsg {
 }
 
 class SdpMsg {
-  sdpMediaDesc? MediaDesc;
-  List<sdpAttrib>? Attrib;
-  sdpConnData? ConnData;
+  sdpMediaDesc MediaDesc = sdpMediaDesc();
+  List<sdpAttrib> Attrib = [];
+  sdpConnData ConnData = sdpConnData();
   String? Src; // Full source if needed
 }
 

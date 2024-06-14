@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:dart_pbx/globals.dart';
+import 'package:dart_pbx/sip_parser/sip.dart';
+import 'package:dart_pbx/transports/transport.dart';
 import 'package:dotenv/dotenv.dart';
 
 class SecureTcpSipServer {
@@ -12,7 +15,12 @@ class SecureTcpSipServer {
   String path_to_certificate_file;
   String path_to_private_key_file;
 
-  SecureTcpSipServer(this.tcpIp, this.tcpPort, this.udpServerIp, this.udpServerPort, this.path_to_certificate_file,
+  SecureTcpSipServer(
+      this.tcpIp,
+      this.tcpPort,
+      this.udpServerIp,
+      this.udpServerPort,
+      this.path_to_certificate_file,
       this.path_to_private_key_file) {
     connect();
   }
@@ -25,7 +33,8 @@ class SecureTcpSipServer {
     // Create a server socket using the security context
     var server = await SecureServerSocket.bind(tcpIp, tcpPort, serverContext);
 
-    print('Server listening on port tls:${server.address.address}:${server.port}');
+    print(
+        'Server listening on port tls:${server.address.address}:${server.port}');
 
     // Listen for connections and handle them asynchronously
     // try {
@@ -52,6 +61,19 @@ class SecureTcpSipServer {
   void handleConnection(SecureSocket socket) {
     print(
         'Connection from ${socket.remoteAddress.address}:${socket.remotePort}');
+    //SecureServerSocket.secureServer();
+    msgToClient(String data, {String? remoteAddress, int? remotePort}) {
+      print("Sending to client");
+      socket.write(data);
+    }
+
+    msgFromClient(String data) {
+      var tx = SipTransport(
+          sockaddr_in(socket.remoteAddress.address, socket.remotePort, 'tls'),
+          sockaddr_in(tcpIp, tcpPort, 'tls'),
+          msgToClient);
+      requestsHander.handle(data, tx);
+    }
 
     socket.listen((List<int> data) {
       // Handle incoming data
@@ -60,6 +82,7 @@ class SecureTcpSipServer {
       //print(object)
       // Echo the received data back to the client
       //socket.write('Server echo: ${String.fromCharCodes(data)}');
+      msgFromClient(dataFromSocket);
     }, onError: (error) {
       // Handle errors
       print('Error: $error');

@@ -1,9 +1,8 @@
 import 'package:dart_pbx/sip_parser/sip.dart';
+import 'package:dart_pbx/transports/transport.dart';
 
 class SipClient {
-  SipClient(String number, sockaddr_in address)
-      : _number = number,
-        _address = address {}
+  SipClient(this.number, this.transport);
 
   // bool operator ==(SipClient other) {
   //   if (_number == other.getNumber()) {
@@ -14,13 +13,13 @@ class SipClient {
   // }
 
   String getNumber() {
-    return _number;
+    return number;
   }
 
-  sockaddr_in getAddress() {
-    return _address;
+  SipTransport getAddress() {
+    return transport;
   }
 
-  String _number;
-  sockaddr_in _address;
+  String number;
+  SipTransport transport;
 }

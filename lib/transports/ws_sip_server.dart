@@ -1,7 +1,11 @@
 import 'dart:io';
 
+import 'package:dart_pbx/globals.dart';
+import 'package:dart_pbx/sip_parser/sip.dart';
+import 'package:dart_pbx/transports/transport.dart';
+
 class WsSipServer {
-  WsSipServer(this.ip, this.port, this.udpServerIp, this.udpServerPort) {
+  WsSipServer(this.ip, this.port) {
     HttpServer.bind(ip, port).then((server) async {
       print('Listening on ws://${server.address.address}:${server.port}');
 
@@ -19,28 +23,26 @@ class WsSipServer {
   }
 
   void handleWebSocket(WebSocket socket) async {
-    RawDatagramSocket udpClient =
-        await RawDatagramSocket.bind(InternetAddress(udpServerIp), 0);
-    //   .then((RawDatagramSocket socket) {
-    //print('UDP client ready to receive');
-    //print('${udpClient.address.address}:${udpClient.port}');
-
-    //handler = ReqHandler(socket.address.address, socket.port, socket);
-
-    onNewMessageFromWS(String data) {
-      // //print(data);
-      udpClient.send(data.toString().codeUnits, InternetAddress(udpServerIp),
-          udpServerPort);
-    }
-
     onNewMessageFromSipServer(String data) {
       socket.add(data);
+    }
+
+    //SecureServerSocket.secureServer();
+    msgToClient(String data, {String? remoteAddress, int? remotePort}) {
+      print("Sending to client");
+      socket.add(data);
+    }
+
+    msgFromClient(String data) {
+      var tx = SipTransport(sockaddr_in(ip, port, 'ws'),
+          sockaddr_in(ip, port, 'ws'), msgToClient);
+      requestsHander.handle(data, tx);
     }
 
     socket.listen(
       (data) {
         //print('Received: $data');
-        onNewMessageFromWS(data);
+        msgFromClient(data);
         //socket.add('Echo: ${json.encode(resp)}');
       },
       onDone: () {
@@ -50,21 +52,8 @@ class WsSipServer {
         //print('Error: $error');
       },
     );
-
-    udpClient.listen((RawSocketEvent e) {
-      Datagram? d = udpClient.receive();
-      if (d != null) {
-        String message = String.fromCharCodes(d.data);
-        ////print(
-        //    'Datagram from ${d.address.address}:${d.port}: ${message.trim()}');
-
-        onNewMessageFromSipServer(message);
-      }
-    });
   }
 
   String ip;
   int port;
-  String udpServerIp;
-  int udpServerPort;
 }

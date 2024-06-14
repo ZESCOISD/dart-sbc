@@ -54,13 +54,13 @@ void main() async {
   }
   //wsSipServer wsSever =
   if (wsIp != null) {
-    WsSipServer(wsIp, wsPort!, udpIp!, udpPort!);
+    WsSipServer(wsIp, wsPort!);
   }
 
   //wssSipServer(wssIp, wssPort, udpIp, udpPort);
 
   if (wssIp != null) {
-    WssSipServer(wssIp, wssPort!, udpIp!, udpPort!, path_to_certificate_file!,
+    WssSipServer(wssIp, wssPort!, path_to_certificate_file!,
         path_to_private_key_file!);
   }
 

@@ -16,48 +16,45 @@ enum State {
 }
 
 class Session {
-  Session(String callID, SipClient src, int srcRtpPort)
-      : _callID = callID,
-        _src = src,
-        _srcRtpPort = srcRtpPort {}
+  Session(this.callID, this.src, this.srcRtpPort);
 
   void setState(State state) {
-    if (state == _state) {
+    if (state == state) {
       return;
     }
-    _state = state;
+    state = state;
     if (state == State.Connected) {
       print(
-          "Session Created between  ${_src.getNumber()} and  _dest->getNumber()");
+          "Session Created between  ${src.getNumber()} and  _dest->getNumber()");
     }
   }
 
   void setDest(SipClient dest, int destRtpPort) {
-    _dest = dest;
-    _destRtpPort = destRtpPort;
+    dest = dest;
+    destRtpPort = destRtpPort;
   }
 
   String getCallID() {
-    return _callID;
+    return callID;
   }
 
   SipClient getSrc() {
-    return _src;
+    return src;
   }
 
   SipClient getDest() {
-    return _dest!;
+    return dest!;
   }
 
   State? getState() {
-    return _state;
+    return state;
   }
 
-  String _callID;
-  SipClient _src;
-  SipClient? _dest;
-  State? _state;
+  String callID;
+  SipClient src;
+  SipClient? dest;
+  State? state;
 
-  int _srcRtpPort;
-  int? _destRtpPort;
+  int srcRtpPort;
+  int? destRtpPort;
 }

@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:dart_pbx/sip_parser/sip.dart';
 
 import '../config/dispartcher.dart';
-import "../requests_handler.dart";
+//import "../requests_handler.dart";
 //import 'SipMessage.dart';
 //import "SipMessageFactory.dart";
 import 'dart:io';
 import '../globals.dart';
+import 'transport.dart';
 
 //import 'addr_port.dart';
 
@@ -18,7 +19,7 @@ class SipServer {
   WebSocket? ion_sfu;
   SipServer(String ip, int port) {
     //RawDatagramSocket _socket;
-    ReqHandler? handler;
+    //ReqHandler? handler;
     //SipMessageFactory messagesFactory = SipMessageFactory();
 
     RawDatagramSocket.bind(InternetAddress(ip), port)
@@ -26,7 +27,7 @@ class SipServer {
       //print('UDP Echo ready to receive');
       print('listening on udp:${socket.address.address}:${socket.port}');
 
-      handler = ReqHandler(socket.address.address, socket.port, socket);
+      //handler = ReqHandler(socket.address.address, socket.port, socket);
 
       // String message = "REGISTER sip:127.0.0.1:5080;transport=UDP SIP/2.0\r\n" +
       //     "Via: SIP/2.0/UDP 127.0.0.1:58086;branch=z9hG4bK-524287-1---a48497ae9a52cae7;rport\r\n" +
@@ -44,41 +45,55 @@ class SipServer {
       //     "Content-Length: 0\r\n";
       initDispatcher();
 
+      //SecureServerSocket.secureServer();
+      msgToClient(String data, {String? destIp, int? destPort}) {
+        print("Sending to client");
+        socket.send(
+            data.toString().codeUnits, InternetAddress(destIp!), destPort!);
+      }
+
+      msgFromClient(String data, {String? remoteAddress, int? remotePort}) {
+        var tx = SipTransport(sockaddr_in(remoteAddress!, remotePort!, 'udp'),
+            sockaddr_in(ip, port, 'udp'), msgToClient);
+        requestsHander.handle(data, tx);
+      }
+
       socket.listen((RawSocketEvent e) {
-        dynamic onHandled(sockaddr_in dest, SipMessage message) {
-          //_socket.send(dest, message.toString());
+        // dynamic onHandled(sockaddr_in dest, SipMessage message) {
+        //   //_socket.send(dest, message.toString());
 
-          socket.send(message.toString().codeUnits, InternetAddress(dest.addr),
-              dest.port);
-        }
+        //   socket.send(message.toString().codeUnits, InternetAddress(dest.addr),
+        //       dest.port);
+        // }
 
-        onNewMessage(String data, sockaddr_in src) {
-          // //print(data);
-          //dynamic msg = SipMessage(data, src) as dynamic;
-          SipMessage msg = SipMessage(); //data, src) as dynamic;
-          msg.transport = src;
-          msg.Parse(data);
-          //if (msg.isValidMessage()) {
-          handler!.handle(msg, src);
-          //} else {
-          // //print("Invalid message");
-          //}
-        }
+        // onNewMessage(String data, sockaddr_in src) {
+        //   // //print(data);
+        //   //dynamic msg = SipMessage(data, src) as dynamic;
+        //   SipMessage msg = SipMessage(); //data, src) as dynamic;
+        //   msg.transport = src;
+        //   msg.Parse(data);
+        //   //if (msg.isValidMessage()) {
+        //   handler!.handle(msg, src);
+        //   //} else {
+        //   // //print("Invalid message");
+        //   //}
+        // }
 
         Datagram? d = socket.receive();
         if (d != null) {
-          //String message = String.fromCharCodes(d.data);
-          String message = utf8.decode(d.data.toList(), allowMalformed: true);
+          String message = String.fromCharCodes(d.data);
+          //String message = utf8.decode(d.data.toList(), allowMalformed: true);
           //String message = ascii.decode(d.data.toList(), allowInvalid: true);
           ////print(
           //    'Datagram from ${d.address.address}:${d.port}: ${message.trim()}');
 
           // //print("\r\n");
-          sockaddr_in src = sockaddr_in(d.address.address, d.port, 'udp');
+          msgFromClient(message,
+              remoteAddress: d.address.address, remotePort: d.port);
           // //print(
           //     "New message from ${d.address.address}:${d.port} message: $message");
 
-          onNewMessage(message, src);
+          //onNewMessage(message, src);
           //socket.send(message.codeUnits, d.address, d.port);
 
           // socket.send(message.toString().codeUnits,
