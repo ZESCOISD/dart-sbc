@@ -121,7 +121,12 @@ class RequestsHandler {
     clients[data.From.User!] = SipClient(data.From.User!, transport);
     //locations[contact_id]?.send = transport.send;
 
-    transport.send(response);
+    if (transport.serverSocket.transport == "udp") {
+      transport.send(response,
+          destIp: transport.socket.addr, destPort: transport.socket.port);
+    } else {
+      transport.send(response);
+    }
   }
 
   onCancel(SipMsg data, {SipTransport? transport}) {}
