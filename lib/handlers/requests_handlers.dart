@@ -43,7 +43,7 @@ class RequestsHandler {
     SipMsg sipMsg = SipMsg();
     sipMsg.Parse(request);
     //print(request);
-    if (sipMsg.Req.Method != null) {
+    if (sipMsg.Req.Method != null && sipMsg.Req.Method!.isNotEmpty) {
       print("request: ${sipMsg.Req.Method}");
       if (handlers[sipMsg.Req.Method!.toLowerCase()] != null) {
         //print(transport.send);
@@ -55,6 +55,23 @@ class RequestsHandler {
       }
     } else if (sipMsg.Req.StatusCode != null) {
       print("Response: ${sipMsg.Req.StatusCode} ${sipMsg.Req.StatusDesc}");
+      if (int.parse(sipMsg.Req.StatusCode!) == 200 &&
+          sipMsg.Req.StatusDesc!.toLowerCase() == "ok") {
+        onOk(sipMsg, transport: transport);
+      }
+      if (int.parse(sipMsg.Req.StatusCode!) == 100 &&
+          sipMsg.Req.StatusDesc!.toLowerCase() == "trying") {
+        onTrying(sipMsg, transport: transport);
+      }
+      if (int.parse(sipMsg.Req.StatusCode!) == 180 &&
+          sipMsg.Req.StatusDesc!.toLowerCase() == "ringing") {
+        onRinging(sipMsg, transport: transport);
+      }
+      if (int.parse(sipMsg.Req.StatusCode!) == 486
+          //&& sipMsg.Req.StatusDesc!.toLowerCase() == "ringing"
+          ) {
+        onBusy(sipMsg, transport: transport);
+      }
     } else {
       print("Uknown SIP message: $request");
     }
@@ -323,6 +340,7 @@ class RequestsHandler {
   }
 
   onOk(SipMsg data, {SipTransport? transport}) {
+    print("handling ok");
     Session? session = sessions[data.CallId.Value];
     if (session != null) {
       if (session.state == State.Cancel) {
