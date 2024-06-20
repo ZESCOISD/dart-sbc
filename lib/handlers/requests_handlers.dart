@@ -165,7 +165,15 @@ class RequestsHandler {
     }
   }
 
-  onCancel(SipMsg data, {SipTransport? transport}) {}
+  onCancel(SipMsg data, {SipTransport? transport}) {
+    //   setCallState(data->getCallID(), Session::State::Cancel);
+    // endHandle(data->getToNumber(), data);
+
+    Session? session = sessions[data.CallId.Value];
+    session?.state = State.Cancel;
+    SipClient? client = clients[data.To.User!];
+    client!.transport.send(data.src!);
+  }
 
   onReqTerminated(SipMsg data, {SipTransport? transport}) {}
   onInvite(SipMsg data, {SipTransport? transport}) {
