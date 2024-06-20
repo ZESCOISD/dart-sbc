@@ -46,17 +46,6 @@ class SipServer {
       initDispatcher();
 
       //SecureServerSocket.secureServer();
-      msgToClient(String data, {String? destIp, int? destPort}) {
-        print("Sending to client");
-        socket.send(
-            data.toString().codeUnits, InternetAddress(destIp!), destPort!);
-      }
-
-      msgFromClient(String data, {String? remoteAddress, int? remotePort}) {
-        var tx = SipTransport(sockaddr_in(remoteAddress!, remotePort!, 'udp'),
-            sockaddr_in(ip, port, 'udp'), msgToClient);
-        requestsHander.handle(data, tx);
-      }
 
       socket.listen((RawSocketEvent e) {
         // dynamic onHandled(sockaddr_in dest, SipMessage message) {
@@ -78,6 +67,17 @@ class SipServer {
         //   // //print("Invalid message");
         //   //}
         // }
+        msgToClient(String data,
+            {required String destIp, required int destPort}) {
+          print("Sending to datagram to client ip: $destIp, port: $destPort");
+          socket.send(data.codeUnits, InternetAddress(destIp), destPort);
+        }
+
+        msgFromClient(String data, {String? clientAddress, int? clientPort}) {
+          var tx = SipTransport(sockaddr_in(clientAddress!, clientPort!, 'udp'),
+              sockaddr_in(ip, port, 'udp'), msgToClient);
+          requestsHander.handle(data, tx);
+        }
 
         Datagram? d = socket.receive();
         if (d != null) {
@@ -89,7 +89,7 @@ class SipServer {
 
           // //print("\r\n");
           msgFromClient(message,
-              remoteAddress: d.address.address, remotePort: d.port);
+              clientAddress: d.address.address, clientPort: d.port);
           // //print(
           //     "New message from ${d.address.address}:${d.port} message: $message");
 

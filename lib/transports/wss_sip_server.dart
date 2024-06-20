@@ -15,6 +15,7 @@ class WssSipServer {
       print('Listening on wss://${server.address.address}:${server.port}');
 
       await for (HttpRequest request in server) {
+        print("Client connected...");
         request.response.headers.set("Sec-WebSocket-Protocol", "sip");
         if (WebSocketTransformer.isUpgradeRequest(request)) {
           WebSocketTransformer.upgrade(request).then(handleWebSocket);
@@ -35,7 +36,7 @@ class WssSipServer {
     //handler = ReqHandler(socket.address.address, socket.port, socket);
 
     //SecureServerSocket.secureServer();
-    msgToClient(String data, {String? remoteAddress, int? remotePort}) {
+    msgToClient(String data) {
       print("Sending to client");
       socket.add(data);
     }

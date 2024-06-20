@@ -46,12 +46,17 @@ class RequestsHandler {
     if (sipMsg.Req.Method != null) {
       print("request: ${sipMsg.Req.Method}");
       if (handlers[sipMsg.Req.Method!.toLowerCase()] != null) {
-        print(transport.send);
+        //print(transport.send);
+        // if (sipMsg.Req.Method!.toLowerCase() == "bye") {
+        //   print("bye: parsed{${sipMsg.src}}, data: $request");
+        // }
         handlers[sipMsg.Req.Method!.toLowerCase()]!(sipMsg,
             transport: transport);
       }
-    } else {
+    } else if (sipMsg.Req.StatusCode != null) {
       print("Response: ${sipMsg.Req.StatusCode} ${sipMsg.Req.StatusDesc}");
+    } else {
+      print("Uknown SIP message: $request");
     }
   }
 
@@ -73,7 +78,7 @@ class RequestsHandler {
     //     ";transport=UDP>");
 
     //response.setHeader(SipMessageTypes.OK);
-    bool viaAdded = false;
+    bool contactAdded = false;
     finalLines.add(SipMessageTypes.OK);
 
     bool toHeaderAdded = false;
@@ -82,43 +87,57 @@ class RequestsHandler {
     String? contact_id;
 
     for (int x = 1; x < lines.length; x++) {
-      if (lines[x].toLowerCase().contains("via") &&
+      if (lines[x].toLowerCase().contains("via") // &&
           //viaAdded &&
-          data.Via[0].Host == transport!.serverSocket.addr) {
+          //data.Via[0].Host == transport!.serverSocket.addr
+          ) {
+        if (lines[x].contains("rport")) {
+          lines[x] =
+              lines[x].replaceFirst("rport", "rport=${transport!.socket.port}");
+        }
         lines[x] = lines[x].replaceFirst(
-            lines[x], "${lines[x]};received=${transport.serverSocket.addr}");
+            lines[x], "${lines[x]};received=${transport!.serverSocket.addr}");
         // print("Checking via");
-        // print(lines[x]);
+        //print("Via header: {${lines[x]}}");
         finalLines.add(lines[x]);
 
-        viaAdded = true;
+        //viaAdded = true;
       } else if (lines[x].toLowerCase().contains("to")) {
         lines[x] =
             lines[x].replaceFirst(lines[x], "${lines[x]};tag=${IDGen()}");
         finalLines.add(lines[x]);
         toHeaderAdded = false;
         //print(lines[x]);
-      } else if (lines[x].toLowerCase().contains("contact")) {
+      } else if (lines[x].toLowerCase().contains("contact") &&
+          !(transport?.serverSocket.transport.toLowerCase() != 'ws' ||
+              transport?.serverSocket.transport.toLowerCase() != 'wss')) {
+        // print(transport?.serverSocket.transport.toUpperCase());
         lines[x] =
             "Contact: <sip:${data.From.User!}@${transport?.serverSocket.addr}:${transport?.serverSocket.port};transport=${transport?.serverSocket.transport.toUpperCase()}>";
         contact_id = lines[x];
+        contactAdded == true;
+        finalLines.add(lines[x]);
         //print(lines[x]);
       } else {
         //print("Line: ${lines[x]}");
         finalLines.add(lines[x]);
       }
     }
+    // if (!contactAdded) {
+    //   finalLines.add(
+    //       "Contact: <sip:${data.From.User!}@${transport?.serverSocket.addr}:${transport?.serverSocket.port};transport=${transport?.serverSocket.transport.toUpperCase()}>");
+    // }
     finalLines.add("\r\n");
     var response = finalLines.join("\r\n");
-    locations[contact_id!] = Location(
-        contact_id,
-        data.From.User!,
-        data.From.Host,
-        contact_id,
-        sockaddr_in(transport!.socket.addr, transport.socket.port,
-            transport.socket.transport));
+    // locations[contact_id!] = Location(
+    //     contact_id,
+    //     data.From.User!,
+    //     data.From.Host,
+    //     contact_id,
+    //     sockaddr_in(transport!.socket.addr, transport.socket.port,
+    //         transport.socket.transport));
     //print(transport!.send);
-    clients[data.From.User!] = SipClient(data.From.User!, transport);
+    clients[data.From.User!] = SipClient(data.From.User!, transport!);
     //locations[contact_id]?.send = transport.send;
 
     if (transport.serverSocket.transport == "udp") {
@@ -133,7 +152,7 @@ class RequestsHandler {
 
   onReqTerminated(SipMsg data, {SipTransport? transport}) {}
   onInvite(SipMsg data, {SipTransport? transport}) {
-    print("Registering user");
+    print("Inviting user: ${data.To.User}");
 
     // Check if the caller is registered
     SipClient? caller = clients[data.From.User!];
@@ -183,6 +202,7 @@ class RequestsHandler {
       var response = finalLines.join("\r\n");
 
       transport!.send(response);
+      print("invited user: ${data.To.User} not found");
       return;
     }
 
@@ -192,6 +212,9 @@ class RequestsHandler {
     // 	std::cerr << "Couldn't get SDP from " << data->getFromNumber() << "'s INVITE request." << std::endl;
     // 	return;
     // }
+
+    print(
+        "invited user: ${data.To.User} found on transport: ${called.transport.serverSocket.transport}");
 
     Session newSession = Session(
         data.CallId.Value!, caller, int.parse(data.Sdp.MediaDesc.Port!));
@@ -239,6 +262,8 @@ class RequestsHandler {
     }
     finalLines.add("\r\n");
     var response = finalLines.join("\r\n");
+    print(
+        "Sending invite response number:${called.number}, sip:${called.transport.socket.transport}:${called.transport.socket.addr}:${called.transport.socket.port}");
     // locations[contact_id!] = Location(
     //     contact_id,
     //     data.From.User!,
@@ -248,17 +273,25 @@ class RequestsHandler {
     //         transport.socket.transport));
     //print(transport!.send);
     // locations[contact_id]?.send = transport.send;
-    called.transport.send(response);
+    // called.transport.send(response);
+    if (called.transport.serverSocket.transport == "udp") {
+      //print("invite: $response");
+      called.transport.send(data.src!,
+          destIp: called.transport.socket.addr,
+          destPort: called.transport.socket.port);
+    } else {
+      called.transport.send(data.src!);
+    }
   }
 
   onTrying(SipMsg data, {SipTransport? transport}) {
     SipClient? client = clients[data.From.User!];
-    client!.transport.send(data.Src!);
+    client!.transport.send(data.src!);
   }
 
   onRinging(SipMsg data, {SipTransport? transport}) {
     SipClient? client = clients[data.From.User!];
-    client!.transport.send(data.Src!);
+    client!.transport.send(data.src!);
   }
 
   onBusy(SipMsg data, {SipTransport? transport}) {
@@ -268,7 +301,7 @@ class RequestsHandler {
     Session? session = sessions[data.CallId.Value];
     session?.state = State.Busy;
     SipClient? client = clients[data.From.User!];
-    client!.transport.send(data.Src!);
+    client!.transport.send(data.src!);
   }
 
   onUnavailable(SipMsg data, {SipTransport? transport}) {
@@ -277,7 +310,7 @@ class RequestsHandler {
     Session? session = sessions[data.CallId.Value];
     session?.state = State.Unavailable;
     SipClient? client = clients[data.From.User!];
-    client!.transport.send(data.Src!);
+    client!.transport.send(data.src!);
   }
 
   onBye(SipMsg data, {SipTransport? transport}) {
@@ -286,7 +319,7 @@ class RequestsHandler {
     Session? session = sessions[data.CallId.Value];
     session?.state = State.Bye;
     SipClient? client = clients[data.To.User!];
-    client!.transport.send(data.Src!);
+    client!.transport.send(data.src!);
   }
 
   onOk(SipMsg data, {SipTransport? transport}) {
@@ -294,7 +327,7 @@ class RequestsHandler {
     if (session != null) {
       if (session.state == State.Cancel) {
         SipClient? client = clients[data.From.User!];
-        client!.transport.send(data.Src!);
+        client!.transport.send(data.src!);
         return;
       }
 
@@ -316,7 +349,7 @@ class RequestsHandler {
         //session->get()->setDest(client.value(), sdpMessage->getRtpPort());
         session.dest = client;
         session.state = State.Connected;
-        String response = data.Src!;
+        String response = data.src!;
         // Send "SIP/2.0 404 Not Found"
         List<String> finalLines = [];
         var lines = data.src!.split('\r\n');
@@ -355,13 +388,13 @@ class RequestsHandler {
         finalLines.add("\r\n");
         var resp = finalLines.join("\r\n");
         client = clients[data.From.User!];
-        client!.transport.send(resp);
+        client!.transport.send(data.src!);
         return;
       }
 
       if (session.state == State.Bye) {
         SipClient? client = clients[data.From.User!];
-        client!.transport.send(data.Src!);
+        client!.transport.send(data.src!);
         sessions.remove(data.CallId.Value);
       }
     }
@@ -374,7 +407,7 @@ class RequestsHandler {
     }
 
     SipClient? client = clients[data.To.User!];
-    client!.transport.send(data.Src!);
+    client!.transport.send(data.src!);
 
     State sessionState = session.state!;
     String endReason;

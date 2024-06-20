@@ -26,7 +26,7 @@ class TcpSipServer {
             'Client connected from ${clientSocket.remoteAddress}:${clientSocket.remotePort}');
 
         //SecureServerSocket.secureServer();
-        msgToClient(String data,{String? destIp,String? port}) {
+        msgToClient(String data) {
           print("Sending to client");
           clientSocket.write(data);
         }

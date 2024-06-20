@@ -27,7 +27,7 @@ class sipReq {
     // if (keep_src==true) {
     // 	Src = v;
     // }
-    print("Request line: $v");
+    //print("Request line: $v");
 //     print("""
 // Parsing Request line: ...
 //     """);
@@ -172,7 +172,7 @@ class sipReq {
       }
       pos++;
     }
-    print("Method: $Method");
+    //print("Method: $Method");
     // print("UriType: $UriType");
     // print("StatusCode: $StatusCode");
     // print("StatusDesc: $StatusDesc");

@@ -121,9 +121,9 @@ class SipMsg {
           //fmt.Println(i, spos, string(lhdr), string(lval))
           switch (lhdr) {
             case "m":
-              Sdp.MediaDesc!.parseSdpMediaDesc(lval);
+              Sdp.MediaDesc.parseSdpMediaDesc(lval);
             case "c":
-              Sdp.ConnData!.parseSdpConnectionData(lval);
+              Sdp.ConnData.parseSdpConnectionData(lval);
             case "a":
               var tmpAttrib = sdpAttrib();
               tmpAttrib.parseSdpAttrib(
@@ -150,20 +150,20 @@ class SipMsg {
     return (i: -1, dtype: null); //, ' '
   }
 
-  void setHeader(String value) {
-    // print("Setting header");
-    int headerPos = Src!.indexOf(header!);
+  // void setHeader(String value) {
+  //   // print("Setting header");
+  //   int headerPos = Src!.indexOf(header!);
 
-    //print("header position $headerPos for $_header to be replaced with $value");
-    if (headerPos == -1) {
-      // print("Header not found");
-      return;
-    }
-    Src = Src!.replaceFirst(header!, value, headerPos);
-    header = value;
+  //   //print("header position $headerPos for $_header to be replaced with $value");
+  //   if (headerPos == -1) {
+  //     // print("Header not found");
+  //     return;
+  //   }
+  //   Src = Src!.replaceFirst(header!, value, headerPos);
+  //   header = value;
 
-    // print(_messageStr);
-  }
+  //   // print(_messageStr);
+  // }
 
   sipReq Req = sipReq();
   sipFrom From = sipFrom();
@@ -179,7 +179,7 @@ class SipMsg {
   sipVal ContLen = sipVal();
   sipAuth Auth = sipAuth();
   sipProxyAuth ProxyAuth = sipProxyAuth();
-  String? Src; // Full source if needed
+  //String? Src; // Full source if needed
   String? header;
 
   sipWwwAuth wwwAuth = sipWwwAuth();

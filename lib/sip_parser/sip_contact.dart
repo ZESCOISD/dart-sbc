@@ -54,38 +54,40 @@ class sipContact {
           }
           if (v[pos] != ' ') {
             // Not a space so check for uri types
-            if (v.substring(pos, pos + 4) == "sip:") {
+            if ((pos + 4 < v.length) && v.substring(pos, pos + 4) == "sip:") {
               state = ParseState.FIELD_USER;
               pos = pos + 4;
               UriType = "sip";
               continue;
             }
-            if (v.substring(pos, pos + 5) == "sips:") {
+            if ((pos + 5 < v.length) && v.substring(pos, pos + 5) == "sips:") {
               state = ParseState.FIELD_USER;
               pos = pos + 5;
               UriType = "sips";
               continue;
             }
-            if (v.substring(pos, pos + 4) == "tel:") {
+            if ((pos + 4 < v.length) && v.substring(pos, pos + 4) == "tel:") {
               state = ParseState.FIELD_USER;
               pos = pos + 4;
               UriType = "tel";
               continue;
             }
             // Look for a Q identifier
-            if (v.substring(pos, pos + 2) == "q=") {
+            if ((pos + 2 < v.length) && v.substring(pos, pos + 2) == "q=") {
               state = ParseState.FIELD_Q;
               pos = pos + 2;
               continue;
             }
             // Look for a Expires identifier
-            if (v.substring(pos, pos + 8) == "expires=") {
+            if ((pos + 8 < v.length) &&
+                v.substring(pos, pos + 8) == "expires=") {
               state = ParseState.FIELD_EXPIRES;
               pos = pos + 8;
               continue;
             }
             // Look for a transport identifier
-            if (v.substring(pos, pos + 10) == "transport=") {
+            if ((pos + 10 < v.length) &&
+                v.substring(pos, pos + 10) == "transport=") {
               state = ParseState.FIELD_TRAN;
               pos = pos + 10;
               continue;

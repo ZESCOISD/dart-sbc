@@ -62,7 +62,7 @@ class SecureTcpSipServer {
     print(
         'Connection from ${socket.remoteAddress.address}:${socket.remotePort}');
     //SecureServerSocket.secureServer();
-    msgToClient(String data, {String? remoteAddress, int? remotePort}) {
+    msgToClient(String data) {
       print("Sending to client");
       socket.write(data);
     }

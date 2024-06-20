@@ -24,12 +24,13 @@ class WsSipServer {
 
   void handleWebSocket(WebSocket socket) async {
     onNewMessageFromSipServer(String data) {
+      print(data);
       socket.add(data);
     }
 
     //SecureServerSocket.secureServer();
-    msgToClient(String data, {String? remoteAddress, int? remotePort}) {
-      print("Sending to client");
+    msgToClient(String data) {
+      //print("Sending to client $data");
       socket.add(data);
     }
 
