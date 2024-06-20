@@ -72,6 +72,11 @@ class RequestsHandler {
           ) {
         onBusy(sipMsg, transport: transport);
       }
+      if (int.parse(sipMsg.Req.StatusCode!) == 480
+          //&& sipMsg.Req.StatusDesc!.toLowerCase() == "ringing"
+          ) {
+        onUnavailable(sipMsg, transport: transport);
+      }
     } else {
       print("Uknown SIP message: $request");
     }
@@ -172,7 +177,16 @@ class RequestsHandler {
     Session? session = sessions[data.CallId.Value];
     session?.state = State.Cancel;
     SipClient? client = clients[data.To.User!];
-    client!.transport.send(data.src!);
+    //client!.transport.send(data.src!);
+
+    if (client!.transport.serverSocket.transport == "udp") {
+      client.transport.send(data.src!,
+          destIp: client.transport.socket.addr,
+          destPort: client.transport.socket.port);
+    } else {
+      //client.transport.send(response);
+      client.transport.send(data.src!);
+    }
   }
 
   onReqTerminated(SipMsg data, {SipTransport? transport}) {}
@@ -311,12 +325,29 @@ class RequestsHandler {
 
   onTrying(SipMsg data, {SipTransport? transport}) {
     SipClient? client = clients[data.From.User!];
-    client!.transport.send(data.src!);
+    // client!.transport.send(data.src!);
+
+    if (client!.transport.serverSocket.transport == "udp") {
+      client.transport.send(data.src!,
+          destIp: client.transport.socket.addr,
+          destPort: client.transport.socket.port);
+    } else {
+      //client.transport.send(response);
+      client.transport.send(data.src!);
+    }
   }
 
   onRinging(SipMsg data, {SipTransport? transport}) {
     SipClient? client = clients[data.From.User!];
-    client!.transport.send(data.src!);
+    //client!.transport.send(data.src!);
+    if (client!.transport.serverSocket.transport == "udp") {
+      client.transport.send(data.src!,
+          destIp: client.transport.socket.addr,
+          destPort: client.transport.socket.port);
+    } else {
+      //client.transport.send(response);
+      client.transport.send(data.src!);
+    }
   }
 
   onBusy(SipMsg data, {SipTransport? transport}) {
@@ -326,7 +357,16 @@ class RequestsHandler {
     Session? session = sessions[data.CallId.Value];
     session?.state = State.Busy;
     SipClient? client = clients[data.From.User!];
-    client!.transport.send(data.src!);
+    //client!.transport.send(data.src!);
+
+    if (client!.transport.serverSocket.transport == "udp") {
+      client.transport.send(data.src!,
+          destIp: client.transport.socket.addr,
+          destPort: client.transport.socket.port);
+    } else {
+      //client.transport.send(response);
+      client.transport.send(data.src!);
+    }
   }
 
   onUnavailable(SipMsg data, {SipTransport? transport}) {
@@ -335,7 +375,16 @@ class RequestsHandler {
     Session? session = sessions[data.CallId.Value];
     session?.state = State.Unavailable;
     SipClient? client = clients[data.From.User!];
-    client!.transport.send(data.src!);
+    //client!.transport.send(data.src!);
+
+    if (client!.transport.serverSocket.transport == "udp") {
+      client.transport.send(data.src!,
+          destIp: client.transport.socket.addr,
+          destPort: client.transport.socket.port);
+    } else {
+      //client.transport.send(response);
+      client.transport.send(data.src!);
+    }
   }
 
   onBye(SipMsg data, {SipTransport? transport}) {
@@ -344,7 +393,16 @@ class RequestsHandler {
     Session? session = sessions[data.CallId.Value];
     session?.state = State.Bye;
     SipClient? client = clients[data.To.User!];
-    client!.transport.send(data.src!);
+    //client!.transport.send(data.src!);
+
+    if (client!.transport.serverSocket.transport == "udp") {
+      client.transport.send(data.src!,
+          destIp: client.transport.socket.addr,
+          destPort: client.transport.socket.port);
+    } else {
+      //client.transport.send(response);
+      client.transport.send(data.src!);
+    }
   }
 
   onOk(SipMsg data, {SipTransport? transport}) {
@@ -353,7 +411,16 @@ class RequestsHandler {
     if (session != null) {
       if (session.state == State.Cancel) {
         SipClient? client = clients[data.From.User!];
-        client!.transport.send(data.src!);
+        //client!.transport.send(data.src!);
+
+        if (client!.transport.serverSocket.transport == "udp") {
+          client.transport.send(data.src!,
+              destIp: client.transport.socket.addr,
+              destPort: client.transport.socket.port);
+        } else {
+          //client.transport.send(response);
+          client.transport.send(data.src!);
+        }
         return;
       }
 
@@ -414,13 +481,31 @@ class RequestsHandler {
         finalLines.add("\r\n");
         var resp = finalLines.join("\r\n");
         client = clients[data.From.User!];
-        client!.transport.send(data.src!);
+        //client!.transport.send(data.src!);
+
+        if (client!.transport.serverSocket.transport == "udp") {
+          client.transport.send(data.src!,
+              destIp: client.transport.socket.addr,
+              destPort: client.transport.socket.port);
+        } else {
+          //client.transport.send(response);
+          client.transport.send(data.src!);
+        }
         return;
       }
 
       if (session.state == State.Bye) {
         SipClient? client = clients[data.From.User!];
-        client!.transport.send(data.src!);
+        //client!.transport.send(data.src!);
+
+        if (client!.transport.serverSocket.transport == "udp") {
+          client.transport.send(data.src!,
+              destIp: client.transport.socket.addr,
+              destPort: client.transport.socket.port);
+        } else {
+          //client.transport.send(response);
+          client.transport.send(data.src!);
+        }
         sessions.remove(data.CallId.Value);
       }
     }
@@ -433,7 +518,16 @@ class RequestsHandler {
     }
 
     SipClient? client = clients[data.To.User!];
-    client!.transport.send(data.src!);
+    //client!.transport.send(data.src!);
+
+    if (client!.transport.serverSocket.transport == "udp") {
+      client.transport.send(data.src!,
+          destIp: client.transport.socket.addr,
+          destPort: client.transport.socket.port);
+    } else {
+      //client.transport.send(response);
+      client.transport.send(data.src!);
+    }
 
     State sessionState = session.state!;
     String endReason;
