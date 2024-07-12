@@ -3,23 +3,23 @@ dart-pbx is a lightweight sip proxy, location server, and registrar that provide
 Features
 Routr's main features are:
 
-[*] Common SIP Server functions; Proxy, Registrar, Location Service
-[*] Programmable routing
-Load balancing strategies against Media Servers like Asterisk and FreeSWITCH
-Session Affinity
-Multi-Tenant/Multi-Domain with Domain level Access Control List
-Region-based routing
-Configurable routing strategies; Intra-Domain, Domain Ingress, Domain Egress, and Peer Egress
-No single point of failure
-Transport: TCP, UDP, TLS, WS, WSS
-In-memory and Redis Location Service
-JSON and YAML files as a data source
-Postgres as a data source
-Server management with the gRPC API
-NodeSDK
-Command-Line Tool
-RTPEngine Middleware
-Helm Chart for Kubernetes Deployments
-Endpoint Authentication with JWT (For web phones)
-Support for STIR/SHAKEN
-Web Application
+[x] Common SIP Server functions; Proxy, Registrar, Location Service
+[x] Programmable routing
+[x] Load balancing strategies against Media Servers like Asterisk and FreeSWITCH
+[x] Session Affinity
+[x] Multi-Tenant/Multi-Domain with Domain level Access Control List
+[x] Region-based routing
+[x] Configurable routing strategies; Intra-Domain, Domain Ingress, Domain Egress, and Peer Egress
+[x] No single point of failure
+[x] Transport: TCP, UDP, TLS, WS, WSS, QUIC
+[x] In-memory and Redis Location Service
+[x] JSON and YAML files as a data source
+[x] Postgres as a data source
+[x] Server management with the gRPC API
+[x] NodeSDK
+[x] Command-Line Tool
+[x] RTPEngine Middleware
+[x] Helm Chart for Kubernetes Deployments
+[x] Endpoint Authentication with JWT (For web phones)
+[x] Support for STIR/SHAKEN
+[x] Web Application
