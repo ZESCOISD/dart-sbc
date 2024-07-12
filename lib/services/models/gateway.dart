@@ -28,7 +28,7 @@ class Gateway {
   // 'state' => 'int'
   //];
   Gateway(this.gwid, this.type, this.address, this.strip, this.probe_mode,
-      this.state, this.socket);
+      this.state, this.socket, this.send);
 
   //protected $fillable = [
   String gwid;
@@ -41,5 +41,6 @@ class Gateway {
   int state;
   sockaddr_in socket;
   String? description;
+  Function send;
   //];
 }

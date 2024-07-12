@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dart_pbx/services/models/gateway.dart';
 import 'package:dart_pbx/sip_parser/sip.dart';
 
 import '../config/dispartcher.dart';
@@ -78,6 +79,9 @@ class SipServer {
               sockaddr_in(ip, port, 'udp'), msgToClient);
           requestsHander.handle(data, tx);
         }
+
+        gateways["10.43.0.55"] = Gateway("webrtc_gateway", 0, "10.43.0.55", 0,
+            0, 0, sockaddr_in("10.43.0.55", 5070, "udp"), msgToClient);
 
         Datagram? d = socket.receive();
         if (d != null) {

@@ -2,7 +2,9 @@
 import 'dart:math';
 
 //import 'package:dart_pbx/services/location_server.dart';
-import 'package:dart_pbx/services/models/location.dart';
+//import 'package:dart_pbx/services/models/gateway.dart';
+//import 'package:dart_pbx/services/models/location.dart';
+import 'package:dart_pbx/globals.dart';
 import 'package:dart_pbx/session.dart';
 import 'package:dart_pbx/sip_client.dart';
 import 'package:dart_pbx/transports/transport.dart';
@@ -196,7 +198,12 @@ class RequestsHandler {
     // Check if the caller is registered
     SipClient? caller = clients[data.From.User!];
     if (caller == null) {
-      return;
+      if (gateways[data.From.Host] != null) {
+        print("Call from gateway");
+        clients[data.From.User!] = SipClient(data.From.User!, transport!);
+        caller = clients[data.From.User!];
+      } else
+        return;
     }
 
     // Check if the called is registered
@@ -240,7 +247,15 @@ class RequestsHandler {
       finalLines.add("\r\n");
       var response = finalLines.join("\r\n");
 
-      transport!.send(response);
+      //transport!.send(response);
+
+      if (transport!.serverSocket.transport == "udp") {
+        transport.send(data.src!,
+            destIp: transport.socket.addr, destPort: transport.socket.port);
+      } else {
+        //client.transport.send(response);
+        transport.send(data.src!);
+      }
       print("invited user: ${data.To.User} not found");
       return;
     }
@@ -256,7 +271,7 @@ class RequestsHandler {
         "invited user: ${data.To.User} found on transport: ${called.transport.serverSocket.transport}");
 
     Session newSession = Session(
-        data.CallId.Value!, caller, int.parse(data.Sdp.MediaDesc.Port!));
+        data.CallId.Value!, caller!, int.parse(data.Sdp.MediaDesc.Port!));
     // _sessions.emplace(data->getCallID(), newSession);
     sessions[data.CallId.Value!] = newSession;
 

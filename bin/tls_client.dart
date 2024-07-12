@@ -6,13 +6,13 @@ void main() async {
   // // Load the certificate chain and private key
   // context.useCertificateChain('path_to_certificate.crt');
   // context.usePrivateKey('path_to_private_key.key');
-  int server_port = 5061;
-  String server_address = "sip.pstnhub.microsoft.com";
+  int server_port = 5068;
+  String server_address = "10.43.0.55";
 
   try {
     Socket socket = await SecureSocket.connect(server_address, server_port,
         onBadCertificate: (certificate) {
-      return true;
+      return false;
     });
 
     socket.listen((List<int> data) {
@@ -32,4 +32,10 @@ void main() async {
     // Handle connection errors
     print('Failed to connect: $e');
   }
+
+  // WebSocket.connect('wss://10.43.0.55:7089',
+  //         headers: {"Sec-WebSocket-Protocol": "sip"})
+  //     .then((onValue) {}, onError: (err) {
+  //   print(err);
+  // });
 }
