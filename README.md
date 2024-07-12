@@ -23,3 +23,11 @@ Dart-pbx's main features are:
 - [x] Endpoint Authentication with JWT (For web phones)
 - [x] Support for STIR/SHAKEN
 - [x] Web Application
+
+Simply run:
+
+```
+git clone https://github.com/Kellykinyama12/dart-pbx.git
+cd dart-pbx
+dart run
+```
