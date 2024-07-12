@@ -1,4 +1,6 @@
-Dart-pbx is a lightweight sip proxy, location server, and registrar that provides a reliable and scalable SIP infrastructure for telephony carriers, communication service providers, integrators and software developers. It is written in dart, a simple and high level language and easy to customize.
+# Dart-pbx: The Future of Programmable SIP Servers
+
+Dart-pbx is a lightweight sip proxy, location server, and registrar that provides a reliable and scalable SIP infrastructure for telephony carriers, communication service providers, integrators and software developers. It is written in dart, a simple and high level language and easy to install, easy to configure and easy to customize.
 
 Features
 Dart-pbx's main features are:
