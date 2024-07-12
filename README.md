@@ -3,8 +3,8 @@ dart-pbx is a lightweight sip proxy, location server, and registrar that provide
 Features
 Routr's main features are:
 
-Common SIP Server functions; Proxy, Registrar, Location Service
-Programmable routing
+[*] Common SIP Server functions; Proxy, Registrar, Location Service
+[*] Programmable routing
 Load balancing strategies against Media Servers like Asterisk and FreeSWITCH
 Session Affinity
 Multi-Tenant/Multi-Domain with Domain level Access Control List
