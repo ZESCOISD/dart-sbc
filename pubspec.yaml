@@ -1,5 +1,5 @@
 name: dart_pbx
-description: A sample command-line application.
+description: Dart-pbx is a lightweight sip proxy, location server, and registrar that provides a reliable and scalable SIP infrastructure for telephony carriers, communication service providers, integrators and software developers. It is written in dart, a simple and high level language and easy to install, easy to configure and easy to customize.
 version: 1.0.0
 # repository: https://github.com/my_org/my_repo
 
