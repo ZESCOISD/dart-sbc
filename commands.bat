@@ -4,3 +4,5 @@ openssl x509 -in mycert.crt -out mycert.pem -outform PEM
 
 openssl x509 -in certificate_chain.crt -out certificate_chain.pem -outform PEM
 
+dart compile exe bin/dart_pbx.dart
+
