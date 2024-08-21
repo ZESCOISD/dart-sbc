@@ -8,7 +8,7 @@ class WssSipServer {
   WssSipServer(this.ip, this.port, this.path_to_certificate_file,
       this.path_to_private_key_file, this.rootCertificate) {
     SecurityContext serverContext = SecurityContext();
-    serverContext.setTrustedCertificates(rootCertificate);
+    //serverContext.setTrustedCertificates(rootCertificate);
     serverContext.useCertificateChain(path_to_certificate_file);
     serverContext.usePrivateKey(path_to_private_key_file);
 
