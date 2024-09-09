@@ -47,6 +47,7 @@ void main() async {
       : null;
   String? path_to_certificate_file = env['PATH_TO_CERTIFICATE_FILE_PEM'];
   String? path_to_private_key_file = env['PATH_TO_PRIVATE_KEY_FILE_PEM'];
+  String? path_to_root_certificate = env['PATH_TO_ROOT_CERTIFICATE_FILE_PEM'];
 
   //SipServer sipServer =
   if (udpIp != null) {
@@ -61,7 +62,7 @@ void main() async {
 
   if (wssIp != null) {
     WssSipServer(wssIp, wssPort!, path_to_certificate_file!,
-        path_to_private_key_file!);
+        path_to_private_key_file!, path_to_root_certificate!);
   }
 
   if (tcpIp != null) {
@@ -69,8 +70,14 @@ void main() async {
   }
 
   if (secureTcpIp != null) {
-    SecureTcpSipServer(secureTcpIp, secureTcpPort!, udpIp!, udpPort!,
-        path_to_certificate_file!, path_to_private_key_file!);
+    SecureTcpSipServer(
+        secureTcpIp,
+        secureTcpPort!,
+        udpIp!,
+        udpPort!,
+        path_to_certificate_file!,
+        path_to_private_key_file!,
+        path_to_root_certificate!);
   }
 
   // if (secureTcpIp != null) {

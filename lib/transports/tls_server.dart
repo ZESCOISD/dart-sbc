@@ -14,6 +14,7 @@ class SecureTcpSipServer {
 
   String path_to_certificate_file;
   String path_to_private_key_file;
+  String rootCertificate;
 
   SecureTcpSipServer(
       this.tcpIp,
@@ -21,12 +22,14 @@ class SecureTcpSipServer {
       this.udpServerIp,
       this.udpServerPort,
       this.path_to_certificate_file,
-      this.path_to_private_key_file) {
+      this.path_to_private_key_file,
+      this.rootCertificate) {
     connect();
   }
   void connect() async {
     // Security context to specify certificate and private key files
     SecurityContext serverContext = SecurityContext(withTrustedRoots: true);
+    //serverContext.setTrustedCertificates(rootCertificate);
     serverContext.useCertificateChain(path_to_certificate_file);
     serverContext.usePrivateKey(path_to_private_key_file);
 

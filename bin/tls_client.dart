@@ -7,7 +7,7 @@ void main() async {
   // context.useCertificateChain('path_to_certificate.crt');
   // context.usePrivateKey('path_to_private_key.key');
   int server_port = 5068;
-  String server_address = "sip.pstnhub.microsoft.com";
+  String server_address = "msteams.zesco.co.zm";
 
   try {
     Socket socket = await SecureSocket.connect(server_address, server_port //,
